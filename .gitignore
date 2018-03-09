@@ -8,7 +8,11 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+include/
 env/
+share/
+bin/
+local/
 build/
 develop-eggs/
 dist/
@@ -99,3 +103,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+\.vscode/
+src/tweets.csv
