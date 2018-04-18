@@ -3,12 +3,15 @@
 """
 author: Andrei Bastos
 organization: Engenharia Elétrica/Ufes
-data: 18/03/2018
+data: 18/02/2018
+describe: main code 
 """
 
 ###################### Importações de Pacotes ##########################
 from flask import Flask, jsonify, abort, request, url_for,  make_response, redirect, send_from_directory
-import datetime, json, re, os, mongoengine
+import datetime, json, re, os
+
+import models.barra, models.linha, models.sistema
 
 ######################### Configurações ##################################
 PESEP_CORE_FOLDER = os.environ.get('PESEP_CORE_FOLDER','~/PESEP/core/')  
@@ -19,7 +22,7 @@ app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 #limitação de 5 MB de arqui
 app.config['SECRET_KEY'] = 'super-secret'
 
 # Caminhos das rotas
-route_default = "/api/"
+route_default = "/"
 route_default_calcules = route_default + "calcule"
 route_default_user = route_default + "user"
 ALLOWED_EXTENSIONS = set(['txt','csv','json', 'png', 'jpg', 'jpeg'])
@@ -34,7 +37,7 @@ def allowed_file(filename):
 
 ####################### Classes #############################################
 class InvalidUsage(Exception):
-    status_code = 400 #codigo padrão
+    status_code = 400 #codigo padrão de erro
 
     def __init__(self, message_error, status_code=None, payload=None):
         Exception.__init__(self)
@@ -56,3 +59,35 @@ def handle_invalid_usage(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
+
+
+######################## Rotas ###############################################
+########### cálculos #######################################################
+# Fluxo de Potência
+@app.route(route_default_calcules+"/flow", methods=['POST','GET'])
+def power_flow():
+    barra = {}
+    linha = {}
+    barras = []
+    linhas = []
+    sistema = models.sistema.Sistema()
+    sistema.importar_barras('../test/models/barra.csv')
+
+    return 'Olá'
+
+
+
+# Curto Circuito
+@app.route(route_default_calcules+"/short", methods=['POST'])
+def short_circuit():
+    pass
+    
+
+
+
+
+
+######################## Função Principal ######################################
+if __name__ == '__main__':   
+    app.run(host="0.0.0.0", port = os.environ.get('port', 5000))
+    
