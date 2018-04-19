@@ -72,11 +72,15 @@ def power_flow():
     #importa barras
     filename_barra = '../test/models/barra.csv'
     filename_linha = '../test/models/linha.csv'
+    filename_fluxo = '../test/models/fluxo.csv'
 
-    sistema.importar_sistema(filename_barra, filename_linha)
+    sistema.ImportarSistema(filename_barra, filename_linha)
 
+    fluxoPotencias  = sistema.CalcularFluxoPotencia()
 
-    return sistema.to_json()
+    output = {"fluxo":[fluxoPotencia.to_dict() for fluxoPotencia in fluxoPotencias] , "sistema":sistema.to_dict()}
+
+    return json.dumps(output)
 
 
 

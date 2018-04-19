@@ -78,7 +78,6 @@ class Linha(mongoengine.Document):
             linha.Tap = float(row[5])
             linha.A = float(row[6])
             
-            print linha.to_json() 
             return linha
         except Exception as identifier:
             print identifier

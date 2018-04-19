@@ -112,7 +112,7 @@ subject to bus_voltate_limits {i in BUS}:
    0.9 <= bus_voltage[i] <= 1.1;
 
 # Carregamento dos dados
-data FPO/dados.dat;
+data /home/andrei/repos/pesep-api/src/math/dados.dat;
 
 # Escalamento e inicialização de dados
 
@@ -198,17 +198,17 @@ for{(l,k,m) in BRANCH} {
 
 # Gera o arquivo de saída
 
-  printf "Barra;Nome;Tensão;Angulo;Pgerada;Qgerada;Pcarga;Qcarga;Para;P_fluxo;Q_fluxo\n" > FPO/saida.csv;
+  printf "Barra,Nome,Tensão,Angulo,Pgerada,Qgerada,Pcarga,Qcarga,Para,P_fluxo,Q_fluxo\n" > fluxo.csv;
   for{i in BUS} {
-  printf "%d;%s;%f;%f;%f;%f;%f;%f\n", i, bus_name[i], bus_voltage[ i], bus_angle[i]*180/3.14159,
-    p_g[i]*Sbase, q_g[i]*Sbase, bus_p_load[i]*Sbase, bus_q_load[i]*Sbase > FPO/saida.csv;
+  printf "%d,%s,%f,%f,%f,%f,%f,%f,,,,\n", i, bus_name[i], bus_voltage[ i], bus_angle[i]*180/3.14159,
+    p_g[i]*Sbase, q_g[i]*Sbase, bus_p_load[i]*Sbase, bus_q_load[i]*Sbase > fluxo.csv;
     
     	for{(l,i,m) in BRANCH} {
-      printf ";;;;;;;%s;%d;%f;%f\n","", m , p_d[l,i,m]*Sbase, q_d[l,i,m]*Sbase > FPO/saida.csv;
+      printf ",,,,,,,%s,%d,%f,%f\n","", m , p_d[l,i,m]*Sbase, q_d[l,i,m]*Sbase > fluxo.csv;
     }
 
     for{(l,k,i) in BRANCH} {
-      printf ";;;;;;;%s;%d;%f;%f\n","", k, p_r[l,k,i]*Sbase, q_r[l,k,i]*Sbase > FPO/saida.csv;
+      printf ",,,,,,,%s,%d,%f,%f\n","", k, p_r[l,k,i]*Sbase, q_r[l,k,i]*Sbase > fluxo.csv;
     }
   }
 

@@ -103,7 +103,6 @@ class Barra(mongoengine.Document):
             barra.Pgeradamin = float(row[11])
             barra.Pgeradamax = float(row[12])
             barra.Qshunt = float(row[13])
-            print barra.to_json() 
             return barra
         except Exception as identifier:
             print identifier
