@@ -66,14 +66,17 @@ def handle_invalid_usage(error):
 # Fluxo de Potência
 @app.route(route_default_calcules+"/flow", methods=['POST','GET'])
 def power_flow():
-    barra = {}
-    linha = {}
-    barras = []
-    linhas = []
-    sistema = models.sistema.Sistema()
-    sistema.importar_barras('../test/models/barra.csv')
+    #cria instância da classe sistema
+    sistema = models.sistema.Sistema()   
 
-    return 'Olá'
+    #importa barras
+    filename_barra = '../test/models/barra.csv'
+    filename_linha = '../test/models/linha.csv'
+
+    sistema.importar_sistema(filename_barra, filename_linha)
+
+
+    return sistema.to_json()
 
 
 

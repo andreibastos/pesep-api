@@ -23,8 +23,8 @@ class Linha(mongoengine.Document):
     A = mongoengine.DecimalField(required=True, default = 0) 
 
     # inicialização do objeto
-    def __init__(self):
-        pass
+    def __init__(self, Item=None, *args, **kwargs):
+        super(mongoengine.Document, self).__init__(*args, **kwargs)
 
     #transformação para dicionário
     def to_dict(self):
@@ -65,6 +65,23 @@ class Linha(mongoengine.Document):
         except Exception as identifier:
             print(identifier)
 
+    @staticmethod
+    def load_row(row):
+        try:
+            linha = Linha()
+            
+            linha.Item = int(row[0]) 
+            linha.Fbus = float(row[1])
+            linha.Tbus = float(row[2])
+            linha.r = float(row[3])
+            linha.x = float(row[4])
+            linha.Tap = float(row[5])
+            linha.A = float(row[6])
+            
+            print linha.to_json() 
+            return linha
+        except Exception as identifier:
+            print identifier
 
     #cabeçário
     def header(self, delimiter=','):
