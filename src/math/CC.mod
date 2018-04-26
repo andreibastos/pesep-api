@@ -17,20 +17,20 @@ param bus_q_load     {BUS};				# Potência reativa da carga
 
 param fault_type    {FAULT};			# Tipo de falta (1-Mono, 2-Bi, 3-Bi com terra, 4-Trifásica)
 param fault_place   {FAULT};			# Localização da falta (1-Barra, 2-Linha)
-param fault_branch  {FAULT};			# Localização da falta na linha
-param fault_r       {FAULT};			# Resistência da falta 
+param fault_branch  {FAULT};			# Localização da falta na linha (0-1)
+param fault_r       {FAULT};			# Resistência da falta (pu)
 
 # Dados das linhas
 
 param branch_k    	 {BRANCH};			# Origem
 param branch_m       {BRANCH};			# Destino 
-param MYBUS          {BRANCH};			# Módulo da impedância
-param AYBUS          {BRANCH};			# Ângulo da impedância
+param B         	 {BRANCH};			# Matriz de admitâncias
+
 
 # Dados nominais
 
-param Sbase;							#Potência nominal
+param Sbase;							# Potência nominal
 
 # Carregamento dos dados
-data dados_falta.dat;
+data dados_falta.dat;					# Entrada de dados
 
