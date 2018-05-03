@@ -69,8 +69,8 @@ else if(k != m) then (sum{(l,k,m) in BRANCH} (branch_g[l,k,m]*sin(branch_def[l,k
                      +sum{(l,m,k) in BRANCH} (-branch_g[l,m,k]*sin(branch_def[l,m,k])-branch_b[l,m,k]*cos(branch_def[l,m,k]))*branch_tap[l,m,k]);
 
 #Montagem da matriz de impedâncias
-param MYBUS{(k,m) in YBUS} = sqrt((G[k,m]^2)+(B[k,m]^2)); 	#Módulo 
-param AYBUS{(k,m) in YBUS} = tan(B[k,m]/G[k,m]); 		 	#Ângulo 
+#param MYBUS{(k,m) in YBUS} = sqrt((G[k,m]^2)+(B[k,m]^2)); 	#Módulo 
+#param AYBUS{(k,m) in YBUS} = tan(B[k,m]/G[k,m]); 		 	#Ângulo 
 
 # Função objetivo
 
@@ -104,7 +104,7 @@ subject to bus_voltate_limits {k in BUS : bus_type[k] == 0}:
 #   -2*3.14159 <= bus_angle[k] <= 2*3.14159;
 
 # Carregamento dos dados
-data ./src/math/dados.dat;
+data dados.dat;
 
 # Escalamento e inicialização de dados
 
@@ -241,5 +241,5 @@ for{(l,k,m) in BRANCH} {
 
 # Gera o arquivo da matriz de admitâncias para o Curto Circuito
   for {(k,m) in YBUS }{
-		printf "%d,%d,%f,%f\n", k, m, MYBUS[k,m], AYBUS[k,m] > matrix_adm.csv;
+		printf "%d,%d,%f\n", k, m, B[k,m] > matrix_adm.csv;
 	}
