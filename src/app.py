@@ -64,8 +64,17 @@ def handle_invalid_usage(error):
 ######################## Rotas ###############################################
 ########### cálculos #######################################################
 # Fluxo de Potência
-@app.route(route_default_calcules+"/flow", methods=['POST','GET'])
+@app.route(route_default_calcules+"/power_flow", methods=['POST','GET'])
 def power_flow():
+    if request.method == 'POST':
+        if request.headers['Content-Type'] == 'application/json':
+            sistema = request.json
+
+            return json.dumps(request.json)
+        else:
+            return json.dumps({"error": request.headers['Content-Type']})
+
+
     #cria instância da classe sistema
     sistema = models.sistema.Sistema()   
 
@@ -76,9 +85,10 @@ def power_flow():
 
     sistema.ImportarSistema(filename_barra, filename_linha)
 
-    fluxoPotencias  = sistema.CalcularFluxoPotencia()
+    fluxoPotencia  = sistema.CalcularFluxoPotencia()
+    print fluxoPotencia.to_json()
 
-    output = {"fluxo":[fluxoPotencia.to_dict() for fluxoPotencia in fluxoPotencias] , "sistema":sistema.to_dict()}
+    output = {"fluxo":fluxoPotencia.to_dict()  , "sistema":sistema.to_dict()}
 
     return json.dumps(output)
 

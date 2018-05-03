@@ -75,8 +75,7 @@ class Sistema(mongoengine.Document):
     def CalcularFluxoPotencia(self):
         try:
             fluxoPotencia = FluxoPotencia(Sistema=self)
-            fluxoPotencias = fluxoPotencia.calcular()
-            return fluxoPotencias
+            return fluxoPotencia.calcular()
         except Exception as identifier:
             print identifier
     
@@ -95,18 +94,11 @@ class FluxoPotencia(mongoengine.Document):
 
     HEADER = ['Barra', 'Nome', 'Tensão', 'Angulo', 'Pgerada', 'Qgerada', 'Pcarga', 'Qcarga','Para', 'P_fluxo', 'Q_fluxo'  ]
 
-    Barra = mongoengine.IntField()
-    Nome = mongoengine.StringField()
-    Tensao = mongoengine.DecimalField()
-    Angulo = mongoengine.DecimalField()
-    Pgerada = mongoengine.DecimalField()
-    Qgerada = mongoengine.DecimalField()
-    Pcarga = mongoengine.DecimalField()
-    Qcarga = mongoengine.DecimalField()
-    Para = mongoengine.DecimalField()
-    P_fluxo = mongoengine.DecimalField()
-    Q_fluxo = mongoengine.DecimalField()
+    barras = []
 
+    rede = []
+
+    
     Sistema = mongoengine.ReferenceField(Sistema)
 
        # inicialização do objeto
@@ -114,26 +106,20 @@ class FluxoPotencia(mongoengine.Document):
         super(mongoengine.Document, self).__init__(*args, **kwargs)
         self.Sistema = Sistema
 
-     #transformação para dicionário
+    #transformação para dicionário
     def to_dict(self):
-        fluxoPotencia = {
-            'Barra':self.Barra,
-            'Nome': self.Nome,
-            'Tensao':self.Tensao,
-            'Angulo':self.Angulo,
-            'Pgerada':self.Pgerada,
-            'Qgerada':self.Qgerada,
-            'Pcarga':self.Pcarga,           
-            'Qcarga':self.Qcarga,          
-            'Para':self.Para,        
-            'P_fluxo':self.P_fluxo,           
-            'Q_fluxo':self.Q_fluxo          
+        fluxoPotencia = { 
+            "barras":self.barras,
+            "rede":self.rede       
             }
         return fluxoPotencia
     
     #transformação para json 
     def to_json(self):
-        return json.dumps(self.to_dict())
+        return json.dumps(self.to_dict(), indent=4, sort_keys=True)
+    
+    def to_csv(self):
+        pass
 
     #carrega a partir de uma string em json
     @classmethod
@@ -144,18 +130,7 @@ class FluxoPotencia(mongoengine.Document):
     @staticmethod
     def load_dict(obj_loaded):
         try:            
-            fluxoPotencia = FluxoPotencia()
-            fluxoPotencia.Barra = obj_loaded.get('Barra')
-            fluxoPotencia.Nome = obj_loaded.get('Nome')
-            fluxoPotencia.Tensao = obj_loaded.get('Tensao')
-            fluxoPotencia.Angulo = obj_loaded.get('Angulo')
-            fluxoPotencia.Pgerada = obj_loaded.get('Pgerada')
-            fluxoPotencia.Qgerada = obj_loaded.get('Qgerada')
-            fluxoPotencia.Pcarga = obj_loaded.get('Pcarga')
-            fluxoPotencia.Qcarga = obj_loaded.get('Qcarga')
-            fluxoPotencia.Para = obj_loaded.get('Para')
-            fluxoPotencia.P_fluxo = obj_loaded.get('P_fluxo')
-            fluxoPotencia.Q_fluxo = obj_loaded.get('Q_fluxo')
+            fluxoPotencia = FluxoPotencia()            
             return fluxoPotencia
 
         except Exception as identifier:
@@ -164,19 +139,7 @@ class FluxoPotencia(mongoengine.Document):
     @staticmethod
     def load_row(row):
         try:
-            fluxoPotencia = FluxoPotencia()
-            fluxoPotencia.Barra = int(row[0]) if (row[0]) != '' else  None
-            fluxoPotencia.Nome = str(row[1]) if (row[1]) != '' else  None
-            fluxoPotencia.Tensao = float(row[2]) if (row[2]) != '' else  None
-            fluxoPotencia.Angulo = float(row[3]) if (row[3]) != '' else  None
-            fluxoPotencia.Pgerada = float(row[4]) if (row[4]) != '' else  None
-            fluxoPotencia.Qgerada = float(row[5]) if (row[5]) != '' else  None
-            fluxoPotencia.Pcarga = float(row[6]) if (row[6]) != '' else  None
-            fluxoPotencia.Qcarga = float(row[7]) if (row[7]) != '' else  None
-            fluxoPotencia.Para = float(row[8]) if (row[8]) != '' else  None
-            fluxoPotencia.P_fluxo = float(row[9]) if (row[9]) != '' else  None
-            fluxoPotencia.Q_fluxo = float(row[10]) if (row[10]) != '' else  None
-            return fluxoPotencia
+            pass            
         except Exception as identifier:
             print identifier
 
@@ -189,16 +152,38 @@ class FluxoPotencia(mongoengine.Document):
 
     def ImportarFluxoPotencia(self, filename):
         try:
-            fluxos = []
-            with open(filename, 'rb') as csvfile:
+            fluxoPotencia = None
+            fluxoPotencia = FluxoPotencia()           
+                       
+
+            with open(filename, 'r') as csvfile:
                 fluxos_reader = csv.reader(csvfile, delimiter=',')
                 index=0
                 for row in fluxos_reader:
                     if index >0:
-                        fluxoPotencia = FluxoPotencia.load_row(row)
-                        fluxos.append(fluxoPotencia)
+                        if row[0] != '':
+                            barra = {}
+                            barra["item"] = int(row[0])
+                            barra["nome"] = row[1]
+                            barra["tensao"] = float(row[2])
+                            barra["angulo"] = float(row[3])
+                            barra["Pgerada"] = float(row[4])
+                            barra["Qgerada"] = float(row[5])
+                            barra["Pcarga"] = float(row[6])
+                            barra["Qcarga"] = float(row[7])
+                            fluxoPotencia.barras.append(barra)
+                            no = {}
+                            no["de"] = barra["item"]
+                        else:
+                            no["para"] = int(row[8])
+                            no["P_Fluxo"] = float(row[9])
+                            no["Q_Fluxo"] = float(row[10])
+                            fluxoPotencia.rede.append(no)
+                            no = {}
+                            no["de"] = barra["item"]
+                
                     index=+1
-            return fluxos
+            return fluxoPotencia
 
         except Exception as identifier:
             print identifier
