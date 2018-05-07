@@ -104,7 +104,7 @@ subject to bus_voltate_limits {k in BUS : bus_type[k] == 0}:
 #   -2*3.14159 <= bus_angle[k] <= 2*3.14159;
 
 # Carregamento dos dados
-data dados.dat;
+data dados_8.dat;
 
 # Escalamento e inicialização de dados
 
@@ -235,11 +235,23 @@ for{(l,k,m) in BRANCH} {
 # Gera o arquivo de barra para o Curto Circuito
 
   for{i in BUS} {
-  printf "%d,%d,%s,%f,%f,%f,%f,%f,%f\n", i, bus_type[i], bus_name[i], bus_voltage[i], bus_angle[i]*180/3.14159,
-    p_g[i]*Sbase, q_g[i]*Sbase, bus_p_load[i]*Sbase, bus_q_load[i]*Sbase > barra_saida.csv;
+  printf "%d,%d,%s,%f,%f\n", i, bus_type[i], bus_name[i], bus_voltage[i], bus_angle[i]*180/3.14159 > barra_saida.csv;
   }
 
 # Gera o arquivo da matriz de admitâncias para o Curto Circuito
   for {(k,m) in YBUS }{
-		printf "%d,%d,%f\n", k, m, B[k,m] > matrix_adm.csv;
+		printf "%d,", k, m, B[k,m] > matrix_adm.csv;
+	}
+
+# Gera o arquivo da matriz de admitâncias para o Curto Circuito
+  for {(k,m) in YBUS }{
+		printf "%d,", k > matrix_adm2.csv;
+	}
+  printf "\n" > matrix_adm2.csv;
+  for {(k,m) in YBUS }{
+		printf "%d,", m > matrix_adm2.csv;
+	}
+  printf "\n" > matrix_adm2.csv;
+  for {(k,m) in YBUS }{
+		printf "%f,", B[k,m] > matrix_adm2.csv;
 	}

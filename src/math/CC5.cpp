@@ -1,69 +1,50 @@
-#include <iostream>
-#include <fstream>
 #include<stdio.h>
 #include<math.h>
 
-using namespace std;
+
 float determinant(float [][25], float);
 void cofactor(float [][25], float);
 void transpose(float [][25], float [][25], float);
+//void printMatrix(float [][25], float);
+
 int main()
 {
-  ifstream ip("matrix_adm.csv");
-
-  if(!ip.is_open()) std::cout << "ERROR: File Open" << '\n';
-
-  string Coluna;
-  string Linha;
-  string Adm;
-
-  while(ip.good()){
-
-    getline(ip,Coluna,',');
-    getline(ip,Linha,',');
-    getline(ip,Adm,'\n');
-
-    //std::cout << "De: "<<Coluna<< '\n';
-    //std::cout << "Para: "<<Linha<< '\n';
-    //std::cout << "Admitancia: "<<Adm<< '\n';
-
-  }
-
-  ip.close();
-
-    // Ler a matriz
+  // Ler a matriz
   float a[25][25], k, d;
-  int i, j, w;
-  //printf("Enter the order of the Matrix : ");
-  //scanf("%f", &k);
-
-
-  //w = sizeof(Coluna);
-  //j = 0;
-   //for(i=0; i < w; i++){
-      //if (Coluna[i] > j){
-         //k = Coluna[i];
-      //}
-   //}
-//printf("%.0f",w);
-
-
-  k = 2;
-  printf("Enter the elements of %.0fX%.0f Matrix : \n", k, k);
+  int i, j;
+  k = 4;
+  FILE *file = fopen("matriz.txt", "r");
+  printf("\nMatriz lida: \n");
   for (i = 0;i < k; i++)
     {
      for (j = 0;j < k; j++)
        {
-        scanf("%f", &a[i][j]);
+        if (!fscanf(file, "%f", &a[i][j]))
+           break;
+           printf("\t%f", a[i][j]);
         }
+        printf("\n");
     }
+   fclose(file);
+//   printMatrix(a,k);
 
   d = determinant(a, k);
   if (d == 0)
-   printf("\nInverse of Entered Matrix is not possible\n");
+   printf("\nSem matriz inversa\n");
   else
    cofactor(a, k);
 }
+
+//void printMatrix(float a, float n){
+//    int j, i;
+//   for (i=0;i<n;i++) {
+//      for (j=0;j<n;j++) {
+//        printf("%f ",a[i][j]);
+//      }
+//      printf("\n");
+//   }
+//   printf("\n");
+//}
 
 /*For calculating Determinant of the Matrix */
 float determinant(float a[25][25], float k)
@@ -160,7 +141,7 @@ void transpose(float num[25][25], float fac[25][25], float r)
         inverse[i][j] = b[i][j] / d;
         }
     }
-   printf("\n\n\nThe inverse of matrix is : \n");
+   printf("\n\n\nInverso da matriz: \n");
 
    for (i = 0;i < r; i++)
     {
