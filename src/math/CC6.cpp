@@ -1,50 +1,86 @@
-#include<stdio.h>
-#include<math.h>
+#include <stdio.h>
+#include <math.h>
+#include <iostream>
+#include <fstream>
+#include <string>
 
+using namespace std;
 
 float determinant(float [][25], float);
 void cofactor(float [][25], float);
 void transpose(float [][25], float [][25], float);
-//void printMatrix(float [][25], float);
 
 int main()
 {
   // Ler a matriz
-  float a[25][25], k, d;
-  int i, j;
-  k = 4;
-  FILE *file = fopen("matriz.txt", "r");
-  printf("\nMatriz lida: \n");
+  FILE *file1 = fopen("adm.txt", "r");
+  FILE *file2 = fopen("coluna.txt", "r");
+  FILE *file3 = fopen("linha.txt", "r");
+  FILE *file4 = fopen("coluna.txt", "r");
+
+  float u[25], a[25][25];
+  int v[25], g[25], x[25];
+  int n, z, i, j, k, w, c, d;
+  //Encontra o numero de elementos do vetor
+  ifstream in("linha.txt");
+  string t;
+  while (in) {
+    t.push_back(in.get());
+  }
+  in.close();
+  int ta = (t.size()/2)+1;
+  printf("Quantidade de elementos no vetor:%i\n", ta-1);
+  for(z = 1;z < ta; ++z)
+  {
+    if (!fscanf(file1, "%f", &u[z]))
+    break;
+    if (!fscanf(file2, "%i", &v[z]))
+    break;
+    if (!fscanf(file3, "%i", &x[z]))
+    break;
+    if (!fscanf(file4, "%i", &g[z]))
+    break;
+    //printf("%f\n", x[z]);
+  }
+  //Encontra o tamanho da matriz
+  for(z = 1;z < ta; ++z)
+  {
+    if(g[0] < g[z])
+    g[0] = g[z];
+  }
+  k = g[0];
+  w = 0;
+  printf("Matriz de ordem:%i\n", k);
+  //Monta a matriz de admitancia
   for (i = 0;i < k; i++)
     {
      for (j = 0;j < k; j++)
        {
-        if (!fscanf(file, "%f", &a[i][j]))
-           break;
-           printf("\t%f", a[i][j]);
+        c = v[i];
+        d = x[j];
+        //printf("%i-%i=%i-%i\n", i,c, j,d);
+        if (c == i && d == j)
+        (begin
+            (a[i][j] = u[w])
+            (++w));
+        else
+            a[i][j] = 0;
+        printf("%f ", a[i][j]);
         }
         printf("\n");
     }
-   fclose(file);
-//   printMatrix(a,k);
+  fclose(file1);
+  fclose(file2);
+  fclose(file3);
 
   d = determinant(a, k);
   if (d == 0)
-   printf("\nSem matriz inversa\n");
+  printf("\nSem matriz inversa\n");
   else
-   cofactor(a, k);
+  cofactor(a, k);
 }
 
-//void printMatrix(float a, float n){
-//    int j, i;
-//   for (i=0;i<n;i++) {
-//      for (j=0;j<n;j++) {
-//        printf("%f ",a[i][j]);
-//      }
-//      printf("\n");
-//   }
-//   printf("\n");
-//}
+
 
 /*For calculating Determinant of the Matrix */
 float determinant(float a[25][25], float k)
