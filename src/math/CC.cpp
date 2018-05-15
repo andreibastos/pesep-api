@@ -1,69 +1,96 @@
+#include <stdio.h>
+#include <math.h>
 #include <iostream>
 #include <fstream>
-#include<stdio.h>
-#include<math.h>
+#include <string>
 
 using namespace std;
+
 float determinant(float [][25], float);
 void cofactor(float [][25], float);
 void transpose(float [][25], float [][25], float);
+
 int main()
 {
-  ifstream ip("matrix_adm.csv");
+  // Ler a matriz
+  FILE *file1 = fopen("sus.txt", "r");
+  FILE *file2 = fopen("coluna.txt", "r");
+  FILE *file3 = fopen("linha.txt", "r");
+ 
+  float matriz_sus[25];
+  float a[25][25] = {{0}} ;
+  int vetor_coluna[25], vetor_linha[25];
+  int  i, j, k, w, c, d;
 
-  if(!ip.is_open()) std::cout << "ERROR: File Open" << '\n';
+  //Encontra o numero de elementos do vetor
+  ifstream in("linha.txt");
+  string t;
+  while (in) {
+    t.push_back(in.get());
+  }
+  in.close();
+  int ta = (t.size()/2);
+  printf("Quantidade de elementos no vetor:%i\n", ta);
+  for(w = 0; w < ta; w++)
+  {
+    if (!fscanf(file1, "%f", &matriz_sus[w]))
+    break;
+    if (!fscanf(file2, "%i", &vetor_coluna[w]))
+    break;
+    if (!fscanf(file3, "%i", &vetor_linha[w]))
+    break;  
+  }
+  
+  fclose(file1);
+  fclose(file2);
+  fclose(file3);
+  
+  //Encontra o tamanho da matriz
+  for(w = 0; w < ta; w++)
+  {
+	 if ( vetor_linha[w] > k )
+	 	k = vetor_linha[w];   	
+  }
+  
+  printf("Matriz de ordem:%i\n", k);
+  //Monta a matriz de admitancia
 
-  string Coluna;
-  string Linha;
-  string Adm;
+// int count_linha = 0;
+  for (w=0; w < ta; w++){
 
-  while(ip.good()){
+    int linha = vetor_linha[w];
+    int coluna = vetor_coluna[w];
+    float sus = matriz_sus[w];
 
-    getline(ip,Coluna,',');
-    getline(ip,Linha,',');
-    getline(ip,Adm,'\n');
+//    printf("%d ", w);
+//    printf("%d ", coluna);
+//    printf("%d ", linha);
+//    printf("%f ", sus);
+//    printf("\n");
 
-    //std::cout << "De: "<<Coluna<< '\n';
-    //std::cout << "Para: "<<Linha<< '\n';
-    //std::cout << "Admitancia: "<<Adm<< '\n';
-
+    a[linha-1][coluna-1] = sus;
   }
 
-  ip.close();
 
-    // Ler a matriz
-  float a[25][25], k, d;
-  int i, j, w;
-  //printf("Enter the order of the Matrix : ");
-  //scanf("%f", &k);
-
-
-  //w = sizeof(Coluna);
-  //j = 0;
-   //for(i=0; i < w; i++){
-      //if (Coluna[i] > j){
-         //k = Coluna[i];
-      //}
-   //}
-//printf("%.0f",w);
+  for(i = 0; i<k;i++){
+      for(j = 0; j<k;j++){
+        printf("%f\t", a[i][j]);
+      }
+    printf("\n");
+  }
 
 
-  k = 2;
-  printf("Enter the elements of %.0fX%.0f Matrix : \n", k, k);
-  for (i = 0;i < k; i++)
-    {
-     for (j = 0;j < k; j++)
-       {
-        scanf("%f", &a[i][j]);
-        }
-    }
+
+
 
   d = determinant(a, k);
   if (d == 0)
-   printf("\nInverse of Entered Matrix is not possible\n");
+  printf("\nSem matriz inversa\n");
   else
-   cofactor(a, k);
+  cofactor(a, k);
 }
+
+
 
 /*For calculating Determinant of the Matrix */
 float determinant(float a[25][25], float k)
@@ -100,6 +127,7 @@ float determinant(float a[25][25], float k)
                }
              }
           det = det + s * (a[0][c] * determinant(b, k - 1));
+          
           s = -1 * s;
           }
     }
@@ -160,7 +188,7 @@ void transpose(float num[25][25], float fac[25][25], float r)
         inverse[i][j] = b[i][j] / d;
         }
     }
-   printf("\n\n\nThe inverse of matrix is : \n");
+   printf("\n\n\nInverso da matriz: \n");
 
    for (i = 0;i < r; i++)
     {
