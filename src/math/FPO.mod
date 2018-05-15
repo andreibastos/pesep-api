@@ -235,11 +235,28 @@ for{(l,k,m) in BRANCH} {
 # Gera o arquivo de barra para o Curto Circuito
 
   for{i in BUS} {
-  printf "%d,%d,%s,%f,%f,%f,%f,%f,%f\n", i, bus_type[i], bus_name[i], bus_voltage[i], bus_angle[i]*180/3.14159,
-    p_g[i]*Sbase, q_g[i]*Sbase, bus_p_load[i]*Sbase, bus_q_load[i]*Sbase > barra_saida.csv;
+  printf "%f ", bus_voltage[i], bus_angle[i]*180/3.14159 > tensao.txt;
+  }
+
+  for{i in BUS} {
+  printf "%f ", bus_angle[i]*180/3.14159 > angulo.txt;
   }
 
 # Gera o arquivo da matriz de admitâncias para o Curto Circuito
   for {(k,m) in YBUS }{
-		printf "%d,%d,%f\n", k, m, B[k,m] > matrix_adm.csv;
+		printf "%f ", B[k,m] > sus.txt;
 	}
+
+# Gera o arquivo da matriz de admitâncias para o Curto Circuito
+  for {(k,m) in YBUS }{
+    printf "%d ", k > coluna.txt;
+  }
+
+  # Gera o arquivo da matriz de admitâncias para o Curto Circuito
+  for {(k,m) in YBUS }{
+    printf "%d ", m > linha.txt;
+  }
+
+
+
+
