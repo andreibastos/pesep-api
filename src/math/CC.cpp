@@ -13,14 +13,15 @@ void transpose(float [][25], float [][25], float);
 int main()
 {
   // Ler a matriz
-  FILE *file1 = fopen("adm.txt", "r");
+  FILE *file1 = fopen("sus.txt", "r");
   FILE *file2 = fopen("coluna.txt", "r");
   FILE *file3 = fopen("linha.txt", "r");
-  FILE *file4 = fopen("coluna.txt", "r");
+ 
+  float matriz_sus[25];
+  float a[25][25] = {{0}} ;
+  int vetor_coluna[25], vetor_linha[25];
+  int  i, j, k, w, c, d;
 
-  float u[25], a[25][25];
-  int v[25], g[25], x[25];
-  int n, z, i, j, k, w, c, d;
   //Encontra o numero de elementos do vetor
   ifstream in("linha.txt");
   string t;
@@ -28,50 +29,59 @@ int main()
     t.push_back(in.get());
   }
   in.close();
-  int ta = (t.size()/2)+1;
-  printf("Quantidade de elementos no vetor:%i\n", ta-1);
-  for(z = 1;z < ta; ++z)
+  int ta = (t.size()/2);
+  printf("Quantidade de elementos no vetor:%i\n", ta);
+  for(w = 0; w < ta; w++)
   {
-    if (!fscanf(file1, "%f", &u[z]))
+    if (!fscanf(file1, "%f", &matriz_sus[w]))
     break;
-    if (!fscanf(file2, "%i", &v[z]))
+    if (!fscanf(file2, "%i", &vetor_coluna[w]))
     break;
-    if (!fscanf(file3, "%i", &x[z]))
-    break;
-    if (!fscanf(file4, "%i", &g[z]))
-    break;
-    //printf("%f\n", x[z]);
+    if (!fscanf(file3, "%i", &vetor_linha[w]))
+    break;  
   }
-  //Encontra o tamanho da matriz
-  for(z = 1;z < ta; ++z)
-  {
-    if(g[0] < g[z])
-    g[0] = g[z];
-  }
-  k = g[0];
-  w = 0;
-  printf("Matriz de ordem:%i\n", k);
-  //Monta a matriz de admitancia
-  for (i = 0;i < k; i++)
-    {
-     for (j = 0;j < k; j++)
-       {
-        c = v[i];
-        d = x[j];
-        //printf("%i-%i=%i-%i\n", i,c, j,d);
-        if (c == i && d == j)
-        (begin
-            (a[i][j] = u[w])
-            (++w));
-        else
-            a[i][j] = 0;
-        printf("%f ", a[i][j]);
-        }
-        printf("\n");
-    }
+  
   fclose(file1);
   fclose(file2);
   fclose(file3);
+  
+  //Encontra o tamanho da matriz
+  for(w = 0; w < ta; w++)
+  {
+	 if ( vetor_linha[w] > k )
+	 	k = vetor_linha[w];   	
+  }
+  
+  printf("Matriz de ordem:%i\n", k);
+  //Monta a matriz de admitancia
+
+// int count_linha = 0;
+  for (w=0; w < ta; w++){
+
+    int linha = vetor_linha[w];
+    int coluna = vetor_coluna[w];
+    float sus = matriz_sus[w];
+
+//    printf("%d ", w);
+//    printf("%d ", coluna);
+//    printf("%d ", linha);
+//    printf("%f ", sus);
+//    printf("\n");
+
+    a[linha-1][coluna-1] = sus;
+  }
+
+
+  for(i = 0; i<k;i++){
+      for(j = 0; j<k;j++){
+        printf("%f\t", a[i][j]);
+      }
+    printf("\n");
+  }
+
+
+
+
 
   d = determinant(a, k);
   if (d == 0)
@@ -117,6 +127,7 @@ float determinant(float a[25][25], float k)
                }
              }
           det = det + s * (a[0][c] * determinant(b, k - 1));
+          
           s = -1 * s;
           }
     }
