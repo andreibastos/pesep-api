@@ -80,9 +80,6 @@ int main()
   }
 
 
-
-
-
   d = determinant(a, k);
   if (d == 0)
   printf("\nSem matriz inversa\n");
