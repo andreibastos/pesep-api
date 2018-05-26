@@ -58,6 +58,7 @@ class InvalidUsage(Exception):
         if status_code is not None:
             self.status_code = status_code
         self.payload = payload
+        print(message_error)
 
     def to_dict(self):
         rv = dict(self.payload or ())
@@ -81,21 +82,22 @@ def handle_invalid_usage(error):
 # Fluxo de Potência
 @app.route(route_default_calcules+"/power_flow", methods=['POST', 'GET'])
 def power_flow():
-    if request.method == 'POST':
-        if request.headers['Content-Type'] == 'application/json':
-            try:
-                bar = request.json["barras"]
-                line = request.json["linhas"]
-                flow = calcule_power_flow(bar, line)
-                resp = Response(json.dumps(flow), status=200,
-                                mimetype='application/json')
-                return resp
+    try:
+        if request.method == 'POST':
+            if request.headers['Content-Type'] == 'application/json':
+                try:
+                    bus = request.json["barras"]
+                    line = request.json["linhas"]
+                    flow = calcule_power_flow(line, bus)
+                    resp = Response(json.dumps(flow), status=200,
+                                    mimetype='application/json')
+                    return resp
 
-            except Exception as identifier:
-                raise identifier
-        else:
-            return handle_invalid_usage({"error": request.headers})
-    return handle_invalid_usage({"error": "only GET"})
+                except Exception as identifier:
+                    raise InvalidUsage(identifier.message)
+
+    except Exception as identifier:
+        raise InvalidUsage(identifier.message)
 
 
 # Curto Circuito
@@ -117,13 +119,17 @@ def verify_consistency(lines, buses):
 
 
 def calcule_power_flow(lines, buses):
-    flow = []
-    consistency = verify_consistency(lines, buses)
-    if consistency:
-        power_flow = PowerFlow(lines, buses)
-        flow = power_flow.calcule()
-    return flow
+    try:
+        flow = []
+        consistency = verify_consistency(lines, buses)
+        if consistency:
+            power_flow = PowerFlow(lines, buses)
+            flow = power_flow.calcule()
+        return flow
+    except:
+        raise
 
-        ######################## Função Principal ######################################
+
+######################## Função Principal ######################################    
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=os.environ.get('port', 5000))
