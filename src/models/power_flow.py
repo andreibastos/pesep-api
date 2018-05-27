@@ -6,7 +6,7 @@ organization: Engenharia Elétrica/Ufes
 data: 23/05/2018
 describe: model of flow_power 
 """
-import os, subprocess
+import os, subprocess, datetime, hashlib, shutil
 
 COMMAND_AMPL = "./solve_fpo_ampl.sh"
 
@@ -21,31 +21,45 @@ class PowerFlow():
 
     def calcule(self):
         try:
-            self.directory = "tmp"
+            directory_temp = "tmp"
+            self.directory = os.path.join(directory_temp,str(hashlib.new('ripemd160',str(self.lines)+str(self.buses)).hexdigest())) 
             try:
-                os.mkdir(self.directory)
+                os.mkdir(directory_temp)
             except:
                 pass
-                
-            name = "linha.csv"
-            name = os.path.join(self.directory,name)
-            save_file(name, self.lines)
 
-            name = "barra.csv"
-            name = os.path.join(self.directory,name)
-            save_file(name, self.buses)
+            try:    
+                os.mkdir(self.directory)
+                name = "linha.csv"
+                name = os.path.join(self.directory,name)
+                save_file(name, self.lines)
 
-            self.execute_ampl()
+                name = "barra.csv"
+                name = os.path.join(self.directory,name)
+                save_file(name, self.buses)
+
+                self.execute_ampl()
+            except:
+                pass
+
             self.load_file()
+            # self.remove_temps()
         except Exception as error:
             print error
 
         return self.power_flow
 
+    def remove_temps(self):
+        try:
+            if (os.path.exists(self.directory)):
+                shutil.rmtree(self.directory, ignore_errors=True)
+        except Exception as error:
+            print error
+
     def execute_ampl(self):
         process = subprocess.Popen( [COMMAND_AMPL, self.directory])
         output, error = process.communicate()
-        print output, error
+        # print output, error
 
     def load_file(self):
         path_fluxo = os.path.join(self.directory, "fluxo.csv")
@@ -58,7 +72,6 @@ class PowerFlow():
                     for column in line:
                         column = column.decode("utf-8").encode("utf-8")
 
-                print(self.power_flow)
                                
 
 def save_file(name, lines):

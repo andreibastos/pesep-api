@@ -7,4 +7,4 @@ cp math/FPO.mod math/dados.dat $dir/
 
 cd $dir
 ls
-../../ampl/ampl FPO.mod
+../../../ampl/ampl FPO.mod
