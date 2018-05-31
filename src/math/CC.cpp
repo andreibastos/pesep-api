@@ -9,6 +9,7 @@ using namespace std;
 float determinant(float [][25], float);
 void cofactor(float [][25], float);
 void transpose(float [][25], float [][25], float);
+void fault (float [25][25], int);
 
 int main()
 {
@@ -30,7 +31,7 @@ int main()
   }
   in.close();
   int ta = (t.size()/2);
-  printf("Quantidade de elementos no vetor:%i\n", ta);
+  //printf("Quantidade de elementos no vetor:%i\n", ta);
   for(w = 0; w < ta; w++)
   {
     if (!fscanf(file1, "%f", &matriz_sus[w]))
@@ -52,7 +53,7 @@ int main()
 	 	k = vetor_linha[w];   	
   }
   
-  printf("Matriz de ordem:%i\n", k);
+  //printf("Matriz de ordem:%i\n", k);
   //Monta a matriz de admitancia
 
 // int count_linha = 0;
@@ -72,15 +73,12 @@ int main()
   }
 
 
-  for(i = 0; i<k;i++){
-      for(j = 0; j<k;j++){
-        printf("%f\t", a[i][j]);
-      }
-    printf("\n");
-  }
-
-
-
+//  for(i = 0; i<k;i++){
+//      for(j = 0; j<k;j++){
+//        printf("%f\t", a[i][j]);
+//      }
+//    printf("\n");
+//  }
 
 
   d = determinant(a, k);
@@ -188,8 +186,8 @@ void transpose(float num[25][25], float fac[25][25], float r)
         inverse[i][j] = b[i][j] / d;
         }
     }
-   printf("\n\n\nInverso da matriz: \n");
-
+    
+   printf("\n\n\nMatriz de impedancia: \n");
    for (i = 0;i < r; i++)
     {
      for (j = 0;j < r; j++)
@@ -198,4 +196,53 @@ void transpose(float num[25][25], float fac[25][25], float r)
         }
     printf("\n");
      }
+     
+    fault(inverse, r);
 }
+
+/*Finding the fault current and voltage*/
+void fault(float imp[25][25], int q)
+{
+	FILE *file4 = fopen("entrada_falta.txt", "r");
+	FILE *file5 = fopen("tensao.txt", "r");
+	FILE *file6 = fopen("angulo.txt", "r");
+	int v, p, dados_falta[7];
+	float tensao[5], angulo[5], i_f, v_n[5];
+	for(v = 0; v < 7; v++)
+  	{
+    if (!fscanf(file4, "%d", &dados_falta[v]))
+    break; 
+    	//printf("%d ", dados_falta[v]);
+  	}
+  	printf("\n");
+  	printf("Tensao de cada barra:\n");
+  	for(p = 0; p < q; p++)
+  	{
+    	if (!fscanf(file5, "%f", &tensao[p]))
+    	break; 
+    	if (!fscanf(file6, "%f", &angulo[p]))
+    	break; 
+    	printf("\t%fL%f\n", tensao[p], angulo[p]);
+  	}
+  	printf("\nDados da falta:");
+	if (dados_falta[0] == 1)
+    {	
+    	printf("\n\tFalta na barra %d", dados_falta[1]);
+	}
+	if (dados_falta[5] == 1)
+    {	
+    	printf("\n\tTrifasica\n");
+    	i_f = tensao[dados_falta[1]-1]/imp[dados_falta[1]-1][dados_falta[1]-1];
+    	printf("\nDados de saida:");
+		printf("\n\tCorrente de falta: %f A", i_f);
+		printf("\n\tTensoes pos-falta:");
+		for(p = 0; p < q; p++)
+  		{
+			v_n[p] = tensao[dados_falta[1]-1]*(1-imp[p][dados_falta[1]-1]/imp[dados_falta[1]-1][dados_falta[1]-1]);
+			printf("\n\t\tBarra %d: %f", p+1, v_n[p]);	
+  		} 
+	}
+}
+
+
+

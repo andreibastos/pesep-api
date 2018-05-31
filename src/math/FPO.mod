@@ -242,21 +242,23 @@ for{(l,k,m) in BRANCH} {
   printf "%f ", bus_angle[i]*180/3.14159 > angulo.txt;
   }
 
-# Gera o arquivo da matriz de admitâncias para o Curto Circuito
+# Gera o arquivo da matriz de susceptâncias para o Curto Circuito
   for {(k,m) in YBUS }{
 		printf "%f ", B[k,m] > sus.txt;
 	}
 
-# Gera o arquivo da matriz de admitâncias para o Curto Circuito
+# Gera o arquivo da coluna para o Curto Circuito
   for {(k,m) in YBUS }{
     printf "%d ", k > coluna.txt;
   }
 
-  # Gera o arquivo da matriz de admitâncias para o Curto Circuito
+  # Gera o arquivo da linha para o Curto Circuito
   for {(k,m) in YBUS }{
     printf "%d ", m > linha.txt;
   }
 
-
-
+# Gera o arquivo da matriz de susceptâncias para o Curto Circuito
+  for {(k,m) in YBUS }{
+		printf "%d,%d,%f\n", k, m, B[k,m] > suscep.txt;
+	}
 
