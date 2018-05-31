@@ -206,7 +206,7 @@ void fault(float imp[25][25], int q)
 	FILE *file4 = fopen("entrada_falta.txt", "r");
 	FILE *file5 = fopen("tensao.txt", "r");
 	FILE *file6 = fopen("angulo.txt", "r");
-	int v, p, dados_falta[7];
+	int v, p, dados_falta[7], local, barra, linha1, linha2, porc_linha, tipo, res_ate;
 	float tensao[5], angulo[5], i_f, v_n[5];
 	for(v = 0; v < 7; v++)
   	{
@@ -214,6 +214,14 @@ void fault(float imp[25][25], int q)
     break; 
     	//printf("%d ", dados_falta[v]);
   	}
+  	local = dados_falta[0];
+  	barra = dados_falta[1];
+  	linha1 = dados_falta[2];
+  	linha2 = dados_falta[3];
+  	porc_linha = dados_falta[4];
+  	tipo = dados_falta[5];
+  	res_ate = dados_falta[6];
+  	
   	printf("\n");
   	printf("Tensao de cada barra:\n");
   	for(p = 0; p < q; p++)
@@ -225,21 +233,21 @@ void fault(float imp[25][25], int q)
     	printf("\t%fL%f\n", tensao[p], angulo[p]);
   	}
   	printf("\nDados da falta:");
-	if (dados_falta[0] == 1)
+	if (local == 1) 									//Falta na barra
     {	
     	printf("\n\tFalta na barra %d", dados_falta[1]);
 	}
-	if (dados_falta[5] == 1)
+	if (tipo == 1)							//Falta trifásica
     {	
     	printf("\n\tTrifasica\n");
-    	i_f = tensao[dados_falta[1]-1]/imp[dados_falta[1]-1][dados_falta[1]-1];
+    	i_f = tensao[dados_falta[1]-1]/((imp[barra-1][barra-1])+res_ate);
     	printf("\nDados de saida:");
 		printf("\n\tCorrente de falta: %f A", i_f);
 		printf("\n\tTensoes pos-falta:");
 		for(p = 0; p < q; p++)
   		{
-			v_n[p] = tensao[dados_falta[1]-1]*(1-imp[p][dados_falta[1]-1]/imp[dados_falta[1]-1][dados_falta[1]-1]);
-			printf("\n\t\tBarra %d: %f", p+1, v_n[p]);	
+			v_n[p] = tensao[barra-1-1]*(1-imp[p][barra-1-1]/((imp[barra-1-1][barra-1-1])+res_ate));
+			printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
   		} 
 	}
 }
