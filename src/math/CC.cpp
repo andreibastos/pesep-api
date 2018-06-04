@@ -246,7 +246,7 @@ void fault(float imp[25][25], int q)
 		printf("\n\tTensoes pos-falta:");
 		for(p = 0; p < q; p++)
   		{
-			v_n[p] = tensao[barra-1-1]*(1-imp[p][barra-1-1]/((imp[barra-1-1][barra-1-1])+res_ate));
+			v_n[p] = tensao[barra-1]*(1-imp[p][barra-1]/((imp[barra-1][barra-1])+res_ate));
 			printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
   		} 
 	}
