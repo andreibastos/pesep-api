@@ -19,6 +19,7 @@ param bus_q_load     {BUS};				# Potência reativa da carga
 param bus_p_gen_min  {BUS};				# Potência ativa mínima no gerador
 param bus_p_gen_max  {BUS};				# Potência ativa máxima no gerador
 param bus_q_shunt    {BUS};				# Potência reativa do shunt em cada barra
+param bus_x    		 {BUS};				# Reatância da barra
 
 # Dados das linhas
 
@@ -65,7 +66,7 @@ else if(k != m) then (sum{(l,k,m) in BRANCH} (-branch_g[l,k,m]*cos(branch_def[l,
 
 param B{(k,m) in YBUS} =		# Monta o vetor de susceptância para o fluxo de potência
 if(k == m) then (sum{(l,k,i) in BRANCH} (branch_b[l,k,i]*branch_tap[l,k,i]^2)
-                                + sum{(l,i,k) in BRANCH} (branch_b[l,i,k]))
+                                + sum{(l,i,k) in BRANCH} (branch_b[l,i,k])-bus_x[k])
 else if(k != m) then (sum{(l,k,m) in BRANCH} (branch_g[l,k,m]*sin(branch_def[l,k,m])-branch_b[l,k,m]*cos(branch_def[l,k,m]))*branch_tap[l,k,m]
                      +sum{(l,m,k) in BRANCH} (-branch_g[l,m,k]*sin(branch_def[l,m,k])-branch_b[l,m,k]*cos(branch_def[l,m,k]))*branch_tap[l,m,k]);
 
@@ -262,6 +263,6 @@ for{(l,k,m) in BRANCH} {
   }
 
 # Gera o arquivo da matriz de susceptâncias para o Curto Circuito
-  for {(k,m) in YBUS }{
-		printf "%d,%d,%f\n", k, m, B[k,m] > suscep.txt;
-	}
+  for {(l,k,m) in BRANCH }{
+		printf "%f ", branch_x[l,k,m] > x_linha.txt;
+  }

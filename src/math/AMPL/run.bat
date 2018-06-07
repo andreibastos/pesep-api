@@ -1,0 +1,2 @@
+ampl FPO.mod
+pause

@@ -7,9 +7,9 @@
 using namespace std;
 
 float determinant(float [][25], float);
-void cofactor(float [][25], float);
-void transpose(float [][25], float [][25], float);
-void fault (float [25][25], int);
+void cofactor(float [][25], float, int[], int[], int);
+void transpose(float [][25], float [][25], float, int[], int[], int);
+void fault (float [25][25], int, int[], int[], int);
 
 int main()
 {
@@ -19,7 +19,7 @@ int main()
   FILE *file3 = fopen("linha.txt", "r");
  
   float matriz_sus[25];
-  float a[25][25] = {{0}} ;
+  float a[25][25] = {{0}};
   int vetor_coluna[25], vetor_linha[25];
   int  i, j, k, w, c, d;
 
@@ -85,7 +85,7 @@ int main()
   if (d == 0)
   printf("\nSem matriz inversa\n");
   else
-  cofactor(a, k);
+  cofactor(a, k, vetor_linha, vetor_coluna, ta);
 }
 
 
@@ -133,7 +133,7 @@ float determinant(float a[25][25], float k)
     return (det);
 }
 
-void cofactor(float num[25][25], float f)
+void cofactor(float num[25][25], float f, int lin[], int col[], int ta)
 {
  float b[25][25], fac[25][25];
  int p, q, m, n, i, j;
@@ -163,10 +163,10 @@ void cofactor(float num[25][25], float f)
       fac[q][p] = pow(-1, q + p) * determinant(b, f - 1);
     }
   }
-  transpose(num, fac, f);
+  transpose(num, fac, f, lin, col, ta);
 }
 /*Finding transpose of matrix*/
-void transpose(float num[25][25], float fac[25][25], float r)
+void transpose(float num[25][25], float fac[25][25], float r, int lin[], int col[], int ta)
 {
   int i, j;
   float b[25][25], inverse[25][25], d;
@@ -197,23 +197,25 @@ void transpose(float num[25][25], float fac[25][25], float r)
     printf("\n");
      }
      
-    fault(inverse, r);
+    fault(inverse, r, lin, col, ta);
 }
 
 /*Finding the fault current and voltage*/
-void fault(float imp[25][25], int q)
+void fault(float imp[25][25], int q, int lin[], int col[], int ta)
 {
 	FILE *file4 = fopen("entrada_falta.txt", "r");
 	FILE *file5 = fopen("tensao.txt", "r");
 	FILE *file6 = fopen("angulo.txt", "r");
+	FILE *file7 = fopen("x_linha.txt", "r");
 	int v, p, dados_falta[7], local, barra, linha1, linha2, porc_linha, tipo, res_ate;
-	float tensao[5], angulo[5], i_f, v_n[5];
+	float tensao[5], angulo[5], i_f, v_n[5], i_l[5], xlinha[10];
 	for(v = 0; v < 7; v++)
   	{
     if (!fscanf(file4, "%d", &dados_falta[v]))
     break; 
     	//printf("%d ", dados_falta[v]);
   	}
+
   	local = dados_falta[0];
   	barra = dados_falta[1];
   	linha1 = dados_falta[2];
@@ -248,6 +250,24 @@ void fault(float imp[25][25], int q)
   		{
 			v_n[p] = tensao[barra-1]*(1-imp[p][barra-1]/((imp[barra-1][barra-1])+res_ate));
 			printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
+  		} 
+ 		
+	for(v = 0; v < (ta-q); v++)
+  	{
+    if (!fscanf(file7, "%f", &xlinha[v]))
+    break; 
+    	printf("%f ", xlinha[v]);
+  	}
+		int i = 0;
+		printf("\n\tCorrente de falta nas linhas:");
+		for(p = 0; p < ta; p++)
+  		{
+  			if (lin[p] != col[p])
+			  {
+				i_l[p] = (v_n[lin[p]]-v_n[col[p]])/xlinha[i];
+				printf("\n\CHEGUEI, %d-%d, %f, %f, %f", lin[p], col[p], v_n[lin[p]], v_n[col[p]],  i_l[p]); //CONSERTAR!!!!
+				++i;
+			  }
   		} 
 	}
 }
