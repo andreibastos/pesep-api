@@ -187,7 +187,7 @@ void transpose(float num[25][25], float fac[25][25], float r, int lin[], int col
         }
     }
     
-   printf("\n\n\nMatriz de impedancia: \n");
+   printf("Matriz de impedancia: \n");
    for (i = 0;i < r; i++)
     {
      for (j = 0;j < r; j++)
@@ -203,6 +203,9 @@ void transpose(float num[25][25], float fac[25][25], float r, int lin[], int col
 /*Finding the fault current and voltage*/
 void fault(float imp[25][25], int q, int lin[], int col[], int ta)
 {
+	FILE *fp1;
+	FILE *fp2;
+	FILE *fp3;
 	FILE *file4 = fopen("entrada_falta.txt", "r");
 	FILE *file5 = fopen("tensao.txt", "r");
 	FILE *file6 = fopen("angulo.txt", "r");
@@ -224,6 +227,12 @@ void fault(float imp[25][25], int q, int lin[], int col[], int ta)
   	tipo = dados_falta[5];
   	res_ate = dados_falta[6];
   	
+  	fp1 = fopen("corrente_falta.txt","w");
+  	fp2 = fopen("tensao_pos_falta.txt","w");
+  	fp3 = fopen("corrente_linha_falta.txt","w");
+    //fprintf(fp, "%s %d", "Tim", 31);
+    //fclose(fp);
+  	
   	printf("\n");
   	printf("Tensao de cada barra:\n");
   	for(p = 0; p < q; p++)
@@ -243,20 +252,22 @@ void fault(float imp[25][25], int q, int lin[], int col[], int ta)
     {	
     	printf("\n\tTrifasica\n");
     	i_f = tensao[dados_falta[1]-1]/((imp[barra-1][barra-1])+res_ate);
+    	fprintf(fp1, "%f,%f,%f", i_f,i_f,i_f);
     	printf("\nDados de saida:");
 		printf("\n\tCorrente de falta: %f A", i_f);
 		printf("\n\tTensoes pos-falta:");
 		for(p = 0; p < q; p++)
   		{
 			v_n[p] = tensao[barra-1]*(1-imp[p][barra-1]/((imp[barra-1][barra-1])+res_ate));
+			fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
 			printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
-  		} 
- 		
+  		} 	
+ 	
 	for(v = 0; v < (ta-q); v++)
   	{
     if (!fscanf(file7, "%f", &xlinha[v]))
     break; 
-    	printf("%f ", xlinha[v]);
+    	//printf("%f ", xlinha[v]);
   	}
 		int i = 0;
 		printf("\n\tCorrente de falta nas linhas:");
@@ -264,12 +275,19 @@ void fault(float imp[25][25], int q, int lin[], int col[], int ta)
   		{
   			if (lin[p] != col[p])
 			  {
-				i_l[p] = (v_n[lin[p]]-v_n[col[p]])/xlinha[i];
-				printf("\n\CHEGUEI, %d-%d, %f, %f, %f", lin[p], col[p], v_n[lin[p]], v_n[col[p]],  i_l[p]); //CONSERTAR!!!!
-				++i;
+			  	if (xlinha[i] > 0.0001 && xlinha[i] < 100)
+				  {
+					i_l[p] = (v_n[lin[p]-1]-v_n[col[p]-1])/xlinha[i];
+					fprintf(fp3,"%d,%d,%f\n",lin[p], col[p], i_l[p]);
+					printf("\n\t\t%d-%d: %f",lin[p], col[p], i_l[p]); 
+				  }
+				  i++;
 			  }
   		} 
 	}
+	fclose(fp1);
+	fclose(fp2);
+	fclose(fp3);
 }
 
 

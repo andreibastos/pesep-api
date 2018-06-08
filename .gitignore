@@ -106,3 +106,7 @@ ENV/
 
 \.vscode/
 src/tweets.csv
+
+src/math/AMPL/
+
+
