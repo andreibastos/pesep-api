@@ -19,6 +19,7 @@ param bus_q_load     {BUS};				# Potência reativa da carga
 param bus_p_gen_min  {BUS};				# Potência ativa mínima no gerador
 param bus_p_gen_max  {BUS};				# Potência ativa máxima no gerador
 param bus_q_shunt    {BUS};				# Potência reativa do shunt em cada barra
+param bus_x    		 {BUS};				# Reatância da barra
 
 # Dados das linhas
 
@@ -39,6 +40,7 @@ param Sbase;		#Potência nominal
 var bus_voltage {i in BUS};		# Tensão nas barras
 var bus_angle   {i in BUS};		# Ângulo nas barras
 var bus_p_gen   {i in BUS};		# Potência ativa das barras de geração nas barras
+var dummy;
 
 # Variáveis auxiliares
 
@@ -64,22 +66,21 @@ else if(k != m) then (sum{(l,k,m) in BRANCH} (-branch_g[l,k,m]*cos(branch_def[l,
 
 param B{(k,m) in YBUS} =		# Monta o vetor de susceptância para o fluxo de potência
 if(k == m) then (sum{(l,k,i) in BRANCH} (branch_b[l,k,i]*branch_tap[l,k,i]^2)
-                                + sum{(l,i,k) in BRANCH} (branch_b[l,i,k]))
+                                + sum{(l,i,k) in BRANCH} (branch_b[l,i,k])-bus_x[k])
 else if(k != m) then (sum{(l,k,m) in BRANCH} (branch_g[l,k,m]*sin(branch_def[l,k,m])-branch_b[l,k,m]*cos(branch_def[l,k,m]))*branch_tap[l,k,m]
                      +sum{(l,m,k) in BRANCH} (-branch_g[l,m,k]*sin(branch_def[l,m,k])-branch_b[l,m,k]*cos(branch_def[l,m,k]))*branch_tap[l,m,k]);
 
-#Montagem da matriz de impedâncias
-#param MYBUS{(k,m) in YBUS} = sqrt((G[k,m]^2)+(B[k,m]^2)); 	#Módulo 
-#param AYBUS{(k,m) in YBUS} = tan(B[k,m]/G[k,m]); 		 	#Ângulo 
-
 # Função objetivo
 
-minimize pot_ativa :	# Fluxo de potência ativa
-sum {k in BUS : bus_type[k] == 0}
-(bus_p_gen[k] - bus_p_load[k] - sum{(k,m) in YBUS} (bus_voltage[k]*bus_voltage[m]*
-(G[k,m]*cos(bus_angle[k]-bus_angle[m])+B[k,m]*sin(bus_angle[k]-bus_angle[m]))));
+# objectivo
+
+minimize dummy_minimization : dummy;
 
 # Restrições
+
+subject to p_load {k in BUS : bus_type[k] == 0}:
+   bus_p_gen[k] + bus_q_shunt[k] - bus_p_load[k] - sum{(k,m) in YBUS} (bus_voltage[k]*bus_voltage[m]*
+                          (G[k,m]*cos(bus_angle[k]-bus_angle[m])+B[k,m]*sin(bus_angle[k]-bus_angle[m]))) = 0;
 				# Fluxo de potência reativa
 subject to q_load {k in BUS : bus_type[k] == 0}:	
    bus_q_gen[k] + bus_q_shunt[k] - bus_q_load[k] - sum{(k,m) in YBUS} (bus_voltage[k]*bus_voltage[m]*
@@ -98,10 +99,10 @@ subject to p_inj_pos {k in BUS : bus_type[k] == 2 || bus_type[k] == 3}:
                (G[k,m]*cos(bus_angle[k]-bus_angle[m])+B[k,m]*sin(bus_angle[ k]-bus_angle[m]))) >= 1e-15;
    				#Limite de tensão transmitida
 subject to bus_voltate_limits {k in BUS : bus_type[k] == 0}:
-   0.90 <= bus_voltage[k] <= 1.1;
+   0.91 <= bus_voltage[k] <= 0.98;
 
-#subject to bus_angle_limits {k in BUS : bus_type[k] == 0 || bus_type[k] == 2}:
-#   -2*3.14159 <= bus_angle[k] <= 2*3.14159;
+subject to dummy_definition:
+	dummy = 0;
 
 # Carregamento dos dados
 data dados.dat;
@@ -139,7 +140,11 @@ fix {i in BUS : bus_type[i] == 3} bus_angle[i] := bus_angle0[i]; 		# Fixa o angu
 fix {i in BUS : bus_type[i] == 3 || bus_type[i] == 2} bus_voltage[i] := bus_voltage0[i]; 	# Fixa a tensão da barra Slack e PV
 fix {i in BUS : bus_type[i] == 2}  bus_p_gen[i] := 	bus_p_gen0[i]; 		# Fixa a potência ativa da barra PV
 
-solve pot_ativa; # Resolve a função objetiva com o solucionador selecionado
+option minos_options " timing=1 summary_file = 6 superbasics_limit = 500 major_iterations = 300 meminc=2.64";
+option loqo_options "sigfig 0 timing=1 iterlim=200 verbose=1";
+option lancelot_options "timing=1";
+option snopt_options " superbasics_limit = 1000 timing=1";
+solve dummy_minimization; # Resolve a função objetiva com o solucionador selecionado
 
 	#Exemplo 05
 #let bus_angle[1] := -0.0388;
@@ -258,7 +263,6 @@ for{(l,k,m) in BRANCH} {
   }
 
 # Gera o arquivo da matriz de susceptâncias para o Curto Circuito
-  for {(k,m) in YBUS }{
-		printf "%d,%d,%f\n", k, m, B[k,m] > suscep.txt;
-	}
-
+  for {(l,k,m) in BRANCH }{
+		printf "%f ", branch_x[l,k,m] > x_linha.txt;
+  }
