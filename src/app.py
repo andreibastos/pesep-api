@@ -101,12 +101,14 @@ def verify_consistency(lines, buses):
 
 def calcule_power_flow(lines, buses):
     try:
-        flow = []
+        results = []
         consistency = verify_consistency(lines, buses)
         if consistency:
             power_flow = PowerFlow(lines, buses)
-            flow = power_flow.calcule()
-        return flow
+            power_flow.calcule()
+            results = power_flow.results
+            print(json.dumps(results, indent=4))
+        return results
     except:
         raise
 
