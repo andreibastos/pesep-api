@@ -107,8 +107,6 @@ ENV/
 # mypy
 .mypy_cache/
 
-\.vscode/
-src/tweets.csv
 
 src/math/AMPL/
 
