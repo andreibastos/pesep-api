@@ -1,3 +1,0 @@
-option ampl_id (_pid);
-write bkestproblem;
-shell 'kestrel submit kestproblem';
