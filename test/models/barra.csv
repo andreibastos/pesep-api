@@ -1,5 +1,0 @@
-#Item,Tipo,Nome,Tensão0,Angulo0,Pgerada,Qgerada,Qmínimo,Qmáximo,Pcarga,Qcarga,Pgeradamín,Pgeradamáx,Qshunt
-1,2,PV,1.05,0,60,0,0,60,0,0,0,60,0
-2,0,PQ,1,0,0,0,0,0,-50,-20,0,0,0
-3,0,PQ,1,0,0,0,0,0,-60,-10,0,0,0
-4,3,VO,1,0,0,0,0,100,0,0,0,100,0
