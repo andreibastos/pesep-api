@@ -189,7 +189,7 @@ void transpose(float num[100][100], float fac[100][100], float r, int lin[], int
         }
     }
     
-   printf("Matriz de impedancia: \n");
+   printf("Matriz de impedancia de seguencia positiva-negativa: \n");
    for (i = 0;i < r; i++)
     {
      for (j = 0;j < r; j++)
@@ -212,8 +212,9 @@ void fault(float imp[100][100], int q, int lin[], int col[], int ta)
 	FILE *file5 = fopen("tensao.txt", "r");
 	FILE *file6 = fopen("angulo.txt", "r");
 	FILE *file7 = fopen("x_linha.txt", "r");
-	int v, p, dados_falta[7], local, barra, linha1, linha2, tipo, res_ate, porc_linha;
-	float tensao[10], angulo[10], i_f, v_n[10], i_l[10], xlinha[100];
+	FILE *file8 = fopen("x_linha_traf.txt", "r");
+	int v, p, dados_falta[7], local, barra, linha1, linha2, tipo, porc_linha;
+	float tensao[10], angulo[10], i_f, v_n[10], i_l[10], xlinha[100], res_ate, res_zero, imp_zero[100][100];
 	for(v = 0; v < 7; v++)
   	{
     if (!fscanf(file4, "%d", &dados_falta[v]))
@@ -228,6 +229,7 @@ void fault(float imp[100][100], int q, int lin[], int col[], int ta)
   	porc_linha = dados_falta[4];
   	tipo = dados_falta[5];
   	res_ate = dados_falta[6];
+  	res_zero = dados_falta[7];
   	
   	fp1 = fopen("corrente_falta.txt","w");
   	fp2 = fopen("tensao_pos_falta.txt","w");
@@ -249,22 +251,44 @@ void fault(float imp[100][100], int q, int lin[], int col[], int ta)
 	if (local == 1) 									//Falta na barra
     {	
     	printf("\n\tFalta na barra %d", barra);
-    	if (tipo == 1)							//Falta trifásica
-    {	
-    	printf("\n\tTrifasica\n");
-    	i_f = tensao[barra-1]/((imp[barra-1][barra-1])+res_ate);
-    	fprintf(fp1, "%f,%f,%f", i_f,i_f,i_f);
-    	printf("\nDados de saida:");
-		printf("\n\tCorrente de falta: %f A", i_f);
-		printf("\n\tTensoes pos-falta:");
-		for(p = 0; p < q; p++)
-  		{
-			v_n[p] = tensao[barra-1]*(1-imp[p][barra-1]/((imp[barra-1][barra-1])+res_ate));
-			fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
-			printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
-  		} 	
+    	if (tipo == 3)							//Falta trifásica
+    	{	
+    		printf("\n\tTrifasica\n");
+    		i_f = tensao[barra-1]/((imp[barra-1][barra-1])+res_ate);
+    		fprintf(fp1, "%f,%f,%f", i_f,i_f,i_f);
+    		printf("\nDados de saida:");
+			printf("\n\tCorrente de falta: %f A", i_f);
+			printf("\n\tTensoes pos-falta:");
+			for(p = 0; p < q; p++)
+  			{
+				v_n[p] = tensao[barra-1]*(1-imp[p][barra-1]/((imp[barra-1][barra-1])+res_ate));
+				fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
+				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
+  			} 	
+		}
 	}
-}
+		//CONTINUAR!!!!!
+//		if (tipo == 1)							//Falta monofásica
+//    	{	
+//    		printf("\n\tMonofasica\n");
+//    		printf("\n\tMatriz de impedancia de seguencia zero:\n");
+//    		for(v = 0; v < q; v++)
+//  			{
+//    			if (!fscanf(file7, "%f", &xlinhatraf[v]))
+//    			break; 
+//    			//printf("%f ", xlinha[v]);
+//  			}
+//    		imp_zero[0][0] = 3*res_ate + xlinhatraf[1];
+//    		imp_zero[barra][barra] = 3*res_ate + xlinhatraf[barra];
+//    		for(p = 1; p < q; p++) 
+//    		{
+//    		    for(v = 1; v < q; v++) 
+//    			{
+//    				imp_zero[p][v] = res_zero
+//				}	
+//			}	
+//		
+//	}
 	if (local == 0) 									//Falta na linha
     {	
     	if (porc_linha == 1)
@@ -275,44 +299,44 @@ void fault(float imp[100][100], int q, int lin[], int col[], int ta)
 			printf("\n\tFalta a %d por cento da linha %d-%d", porc_linha, linha1, linha2);
 			
 		}
-		if (tipo == 1)							//Falta trifásica
-    {	
-    	printf("\n\tTrifasica\n");
-    	i_f = (tensao[linha1]-tensao[linha2])/((imp[linha1][linha2])+res_ate);
-    	fprintf(fp1, "%f,%f,%f", i_f,i_f,i_f);
-    	printf("\nDados de saida:");
-		printf("\n\tCorrente de falta: %f A", i_f);
-		printf("\n\tTensoes pos-falta:");
-		for(p = 0; p < q; p++)
-  		{
-			v_n[p] = (tensao[linha1-1]-tensao[linha2-1])*(1-imp[p][linha1-1]/((imp[linha1-1][linha2-1])+res_ate));
-			fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
-			printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
-  		} 	
-	}
+		if (tipo == 3)							//Falta trifásica
+    	{	
+    		printf("\n\tTrifasica\n");
+    		i_f = (tensao[linha1]-tensao[linha2])/((imp[linha1][linha2])+res_ate);
+    		fprintf(fp1, "%f,%f,%f", i_f,i_f,i_f);
+    		printf("\nDados de saida:");
+			printf("\n\tCorrente de falta: %f A", i_f);
+			printf("\n\tTensoes pos-falta:");
+			for(p = 0; p < q; p++)
+  			{
+				v_n[p] = (tensao[linha1-1]-tensao[linha2-1])*(1-imp[p][linha1-1]/((imp[linha1-1][linha2-1])+res_ate));
+				fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
+				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
+  			} 	
+		}
 	}
 		
 	for(v = 0; v < (ta-q); v++)
   	{
-    if (!fscanf(file7, "%f", &xlinha[v]))
-    break; 
+    	if (!fscanf(file7, "%f", &xlinha[v]))
+    	break; 
     	//printf("%f ", xlinha[v]);
   	}
-		int i = 0;
-		printf("\n\tCorrente de falta nas linhas:");
-		for(p = 0; p < ta; p++)
-  		{
-  			if (lin[p] != col[p])
-			  {
-			  	if (xlinha[i] > 0.0001 && xlinha[i] < 100)
-				  {
-					i_l[p] = (v_n[lin[p]-1]-v_n[col[p]-1])/xlinha[i];
-					fprintf(fp3,"%d,%d,%f\n",lin[p], col[p], i_l[p]);
-					printf("\n\t\t%d-%d: %f",lin[p], col[p], i_l[p]); 
-				  }
-				  i++;
-			  }
-  		} 
+	int i = 0;
+	printf("\n\tCorrente de falta nas linhas:");
+	for(p = 0; p < ta; p++)
+  	{
+  		if (lin[p] != col[p])
+		{
+			if (xlinha[i] > 0.0001 && xlinha[i] < 100)
+			{
+				i_l[p] = (v_n[lin[p]-1]-v_n[col[p]-1])/xlinha[i];
+				fprintf(fp3,"%d,%d,%f\n",lin[p], col[p], i_l[p]);
+				printf("\n\t\t%d-%d: %f",lin[p], col[p], i_l[p]); 
+			}
+			i++;
+		}	
+  	} 
 	fclose(fp1);
 	fclose(fp2);
 	fclose(fp3);

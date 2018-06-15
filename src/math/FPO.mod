@@ -28,8 +28,9 @@ param branch_r       {BRANCH};			# Resistência
 param branch_x       {BRANCH};			# Indutância
 param branch_tap     {BRANCH};			# Razão de transformação
 param branch_def     {BRANCH};			# Angulo de defasamento
+param branch_x_traf  {BRANCH};		    # Impedância do transformador
 param branch_g       {(l,k,m) in BRANCH} := branch_r[l,k,m]/(branch_r[l,k,m]^2+branch_x[l,k,m]^2); # Condutância
-param branch_b       {(l,k,m) in BRANCH} :=-branch_x[l,k,m]/(branch_r[l,k,m]^2+branch_x[l,k,m]^2); # Susceptância
+param branch_b       {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m])^2); # Susceptância
 
 # Dados nominais
 
@@ -265,4 +266,9 @@ for{(l,k,m) in BRANCH} {
 # Gera o arquivo da matriz de susceptâncias para o Curto Circuito
   for {(l,k,m) in BRANCH }{
 		printf "%f ", branch_x[l,k,m] > x_linha.txt;
+  }
+
+# Gera o arquivo das impedâncias dos transformadores para o Curto Circuito mono e bifásico
+  for {(l,k,m) in BRANCH }{
+		printf "%f ", branch_x_traf[l,k,m] > x_linha_traf.txt;
   }
