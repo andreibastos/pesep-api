@@ -59,29 +59,14 @@ int main()
   //Monta a matriz de admitancia
 
 // int count_linha = 0;
-  for (w=0; w < ta; w++){
+  for (w=0; w < ta; w++)
+  {
 
     int linha = vetor_linha[w];
     int coluna = vetor_coluna[w];
     float sus = matriz_sus[w];
-
-//    printf("%d ", w);
-//    printf("%d ", coluna);
-//    printf("%d ", linha);
-//    printf("%f ", sus);
-//    printf("\n");
-
     a[linha-1][coluna-1] = sus;
   }
-
-
-//  for(i = 0; i<k;i++){
-//      for(j = 0; j<k;j++){
-//        printf("%f\t", a[i][j]);
-//      }
-//    printf("\n");
-//  }
-
 
   d = determinant(a, k);
   if (d == 0)
@@ -213,13 +198,14 @@ void fault(float imp[100][100], int q, int lin[], int col[], int ta)
 	FILE *file6 = fopen("angulo.txt", "r");
 	FILE *file7 = fopen("x_linha.txt", "r");
 	FILE *file8 = fopen("x_linha_traf.txt", "r");
-	int v, p, dados_falta[7], local, barra, linha1, linha2, tipo, porc_linha;
-	float tensao[10], angulo[10], i_f, v_n[10], i_l[10], xlinha[100], res_ate, res_zero, imp_zero[100][100];
-	for(v = 0; v < 7; v++)
+	FILE *file9 = fopen("sus_zero.txt", "r");
+	int v, p, local, barra, linha1, linha2, tipo, porc_linha;
+	float tensao[10], angulo[10], i_f, v_n[10], i_l[10], xlinha[100], xlinhatraf[100], res_ate, res_zero, imp_zero[100][100], dados_falta[7], tipo_trafo, sus_zero[100];
+	for(v = 0; v <= 8; v++)
   	{
-    if (!fscanf(file4, "%d", &dados_falta[v]))
+    if (!fscanf(file4, "%f", &dados_falta[v]))
     break; 
-    	//printf("%d ", dados_falta[v]);
+//    	printf("%f ", dados_falta[v]);
   	}
 
   	local = dados_falta[0];
@@ -230,6 +216,7 @@ void fault(float imp[100][100], int q, int lin[], int col[], int ta)
   	tipo = dados_falta[5];
   	res_ate = dados_falta[6];
   	res_zero = dados_falta[7];
+  	tipo_trafo = dados_falta[8];
   	
   	fp1 = fopen("corrente_falta.txt","w");
   	fp2 = fopen("tensao_pos_falta.txt","w");
@@ -266,29 +253,67 @@ void fault(float imp[100][100], int q, int lin[], int col[], int ta)
 				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
   			} 	
 		}
+		if (tipo == 1)							//Falta monofásica
+    	{	
+    		printf("\n\tMonofasica\n");
+    		for(v = 0; v < q; v++)
+  			{
+    			if (!fscanf(file7, "%f", &xlinha[v]))
+    			break;
+			 	if (!fscanf(file8, "%f", &xlinhatraf[v]))
+    			break;
+    			//printf("%f ", xlinha[v]);
+  			}
+			if (tipo_trafo == 1)							//Transformadores D-Y
+    		{
+  				printf("\tTransformadores D-Y\n");
+  				printf("\nMatriz de impedancia de seguencia zero:\n");
+    			for(p = 0; p < q; p++) 
+    			{
+    		    	for(v = 0; v < q; v++) 
+    				{
+    					if (p == 0 && v == 0 || p == barra && v == barra)
+						{
+    						imp_zero[p][v] = 3*res_ate + xlinhatraf[p-v];	
+    					}
+    					else if (p == v && p < barra-1)
+						{
+    						imp_zero[p][v] = xlinhatraf[v-1] + xlinha[p-1];	
+    					}
+    					else if (p == v && p >= barra-1)
+						{
+    						imp_zero[p][v] = xlinhatraf[p] + xlinha[p] + res_zero;	
+    					}
+    					else if (p != v && (p != 0 && v != 0) && (p != barra && v != barra) && v > p)
+						{
+    						imp_zero[p][v] = xlinhatraf[v] + xlinha[v];
+    					}
+    					else if (p != v && (p != 0 && v != 0) && (p != barra && v != barra) && v < p)
+						{
+    						imp_zero[p][v] = xlinhatraf[p] + xlinha[p];
+    					}
+						printf("\t%f", imp_zero[p][v]);
+					}
+					printf("\n");	
+				}
+			}
+			if (tipo_trafo == 2)							//Transformadores Y-Y
+    		{
+    			printf("\tTransformadores Y-Y\n");
+				for(p = 0; p < q; p++)
+  				{
+    				if (!fscanf(file9, "%f", &sus_zero[p]))
+    				break;
+				}
+				
+			}
+			i_f = tensao[barra-1]/(2*(imp[barra-1][barra-1])+imp_zero[barra-1][barra-1]);
+    		fprintf(fp1, "%f", i_f);
+			printf("\nDados de saida:");
+			printf("\n\tCorrente de falta: %f A", i_f);
+		}	
 	}
-		//CONTINUAR!!!!!
-//		if (tipo == 1)							//Falta monofásica
-//    	{	
-//    		printf("\n\tMonofasica\n");
-//    		printf("\n\tMatriz de impedancia de seguencia zero:\n");
-//    		for(v = 0; v < q; v++)
-//  			{
-//    			if (!fscanf(file7, "%f", &xlinhatraf[v]))
-//    			break; 
-//    			//printf("%f ", xlinha[v]);
-//  			}
-//    		imp_zero[0][0] = 3*res_ate + xlinhatraf[1];
-//    		imp_zero[barra][barra] = 3*res_ate + xlinhatraf[barra];
-//    		for(p = 1; p < q; p++) 
-//    		{
-//    		    for(v = 1; v < q; v++) 
-//    			{
-//    				imp_zero[p][v] = res_zero
-//				}	
-//			}	
-//		
-//	}
+	
 	if (local == 0) 									//Falta na linha
     {	
     	if (porc_linha == 1)

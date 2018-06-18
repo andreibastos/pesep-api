@@ -5,5 +5,5 @@ param: BUS: bus_type bus_name bus_voltage0 bus_angle0 bus_p_gen0 bus_q_gen
 			bus_p_gen_max bus_q_shunt bus_x:=
 include  barra.csv;
 
-param: BRANCH: branch_r branch_x branch_tap branch_def branch_x_traf:=
+param: BRANCH: branch_r branch_x branch_tap branch_def branch_x_traf branch_res_zero:=
 include  linha.csv;

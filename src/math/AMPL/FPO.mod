@@ -29,8 +29,10 @@ param branch_x       {BRANCH};			# Indutância
 param branch_tap     {BRANCH};			# Razão de transformação
 param branch_def     {BRANCH};			# Angulo de defasamento
 param branch_x_traf  {BRANCH};		    # Impedância do transformador
+param branch_res_zero{BRANCH};		    # Resistência da linha de seguência zero
 param branch_g       {(l,k,m) in BRANCH} := branch_r[l,k,m]/(branch_r[l,k,m]^2+branch_x[l,k,m]^2); # Condutância
 param branch_b       {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m])^2); # Susceptância
+param branch_b_zero  {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m]+branch_res_zero[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m]+branch_res_zero[l,k,m])^2); # Susceptância de sequência zero
 
 # Dados nominais
 
@@ -70,6 +72,12 @@ if(k == m) then (sum{(l,k,i) in BRANCH} (branch_b[l,k,i]*branch_tap[l,k,i]^2)
                                 + sum{(l,i,k) in BRANCH} (branch_b[l,i,k])-bus_x[k])
 else if(k != m) then (sum{(l,k,m) in BRANCH} (branch_g[l,k,m]*sin(branch_def[l,k,m])-branch_b[l,k,m]*cos(branch_def[l,k,m]))*branch_tap[l,k,m]
                      +sum{(l,m,k) in BRANCH} (-branch_g[l,m,k]*sin(branch_def[l,m,k])-branch_b[l,m,k]*cos(branch_def[l,m,k]))*branch_tap[l,m,k]);
+
+param B_zero{(k,m) in YBUS} =		# Monta o vetor de susceptância para o fluxo de potência
+if(k == m) then (sum{(l,k,i) in BRANCH} (branch_b_zero[l,k,i]*branch_tap[l,k,i]^2)
+                                + sum{(l,i,k) in BRANCH} (branch_b_zero[l,i,k])-bus_x[k])
+else if(k != m) then (sum{(l,k,m) in BRANCH} (branch_g[l,k,m]*sin(branch_def[l,k,m])-branch_b_zero[l,k,m]*cos(branch_def[l,k,m]))*branch_tap[l,k,m]
+                     +sum{(l,m,k) in BRANCH} (-branch_g[l,m,k]*sin(branch_def[l,m,k])-branch_b_zero[l,m,k]*cos(branch_def[l,m,k]))*branch_tap[l,m,k]);
 
 # Função objetivo
 
@@ -251,6 +259,11 @@ for{(l,k,m) in BRANCH} {
 # Gera o arquivo da matriz de susceptâncias para o Curto Circuito
   for {(k,m) in YBUS }{
 		printf "%f ", B[k,m] > sus.txt;
+	}
+
+# Gera o arquivo da matriz de susceptâncias para o Curto Circuito
+  for {(k,m) in YBUS }{
+		printf "%f ", B_zero[k,m] > sus_zero.txt;
 	}
 
 # Gera o arquivo da coluna para o Curto Circuito
