@@ -10,7 +10,7 @@ param bus_type       {BUS};				# Tipo (3-Slack 2-PV 0-PQ)
 param bus_name       {BUS} symbolic;	# Nome 
 param bus_voltage0   {BUS};				# Tensão inicial: As PQs serão 1
 param bus_angle0     {BUS};				# Ângulo inicial: As PQs e PVs serão 0
-param bus_p_gen0     {BUS};			    # Potência ativa do gerador
+param bus_p_gen0     {BUS};			  # Potência ativa do gerador
 param bus_q_gen      {BUS};				# Potência reativa do gerador
 param bus_q_min      {BUS};				# Potência reativa mínima
 param bus_q_max      {BUS};				# Potência reativa máxima
@@ -19,7 +19,7 @@ param bus_q_load     {BUS};				# Potência reativa da carga
 param bus_p_gen_min  {BUS};				# Potência ativa mínima no gerador
 param bus_p_gen_max  {BUS};				# Potência ativa máxima no gerador
 param bus_q_shunt    {BUS};				# Potência reativa do shunt em cada barra
-param bus_x    		 {BUS};				# Reatância da barra
+param bus_x    		   {BUS};				# Reatância da barra
 
 # Dados das linhas
 

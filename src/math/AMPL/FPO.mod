@@ -30,6 +30,7 @@ param branch_tap     {BRANCH};			# Razão de transformação
 param branch_def     {BRANCH};			# Angulo de defasamento
 param branch_x_traf  {BRANCH};		    # Impedância do transformador
 param branch_res_zero{BRANCH};		    # Resistência da linha de seguência zero
+param branch_traf	 {BRANCH};			# Tipo de transformador: 1-DY e 2-YY
 param branch_g       {(l,k,m) in BRANCH} := branch_r[l,k,m]/(branch_r[l,k,m]^2+branch_x[l,k,m]^2); # Condutância
 param branch_b       {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m])^2); # Susceptância
 param branch_b_zero  {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m]+branch_res_zero[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m]+branch_res_zero[l,k,m])^2); # Susceptância de sequência zero
@@ -284,4 +285,14 @@ for{(l,k,m) in BRANCH} {
 # Gera o arquivo das impedâncias dos transformadores para o Curto Circuito mono e bifásico
   for {(l,k,m) in BRANCH }{
 		printf "%f ", branch_x_traf[l,k,m] > x_linha_traf.txt;
+  }
+
+  # Gera o arquivo das impedâncias dos transformadores para o Curto Circuito mono e bifásico
+  for {(l,k,m) in BRANCH}{
+		printf "%d ", branch_traf[l,k,m] > tipo_traf.txt;
+  }
+
+  # Gera o arquivo das impedâncias dos transformadores para o Curto Circuito mono e bifásico
+  for {(l,k,m) in BRANCH}{
+		printf "%d ", m > local_tipo_traf.txt;
   }
