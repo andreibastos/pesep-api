@@ -239,7 +239,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 	FILE *file10 = fopen("tipo_traf.txt", "r");
 	FILE *file11 = fopen("local_tipo_traf.txt", "r");
 	int v, p, local, barra, linha1, linha2, tipo, porc_linha, tipo_trafo[10], local_tipo_trafo[10];
-	float tensao[10], angulo[10], i_f, v_n[10], v_n_zero[10], v_n_n[10], v_n_g[10], v_n_zero_g[10], i_l[10], a_n_g[10], a_n_zero[10], xlinha[100], xlinhatraf[100], res_ate, res_zero, dados_falta[7], sus_zero[100];
+	float tensao[10], angulo[10], i_f, v_n[10], v_n_zero[10], v_n_n[10], v_n_g[10], v_n_zero_g[10],  i_n_n[10], i_n_g[10], i_n_zero_g[10], i_l[10], a_n_g[10], a_n_zero[10], xlinha[100], xlinhatraf[100], res_ate, res_zero, dados_falta[7], sus_zero[100];
 	for(v = 0; v <= 8; v++)
   	{
     if (!fscanf(file4, "%f", &dados_falta[v]))
@@ -360,6 +360,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     			fprintf(fp1, "%f", i_f);
 				printf("\nDados de saida:");
 				printf("\n\tCorrente de falta: %f A", i_f);
+				printf("\n\tTensoes pos-falta:");
 				for(p = 0; p < q; p++)
   				{
 					v_n_zero[p] = -imp_zero[p][barra-1]*i_f/3;
@@ -406,27 +407,33 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 		}
 	}
 		
-//	for(v = 0; v < (ta-q); v++)
-//  	{
-//    	if (!fscanf(file7, "%f", &xlinha[v]))
-//    	break; 
-//    	//printf("%f ", xlinha[v]);
-//  	}
-//	int i = 0;
-//	printf("\n\tCorrente de falta nas linhas:");
-//	for(p = 0; p < ta; p++)
-//  	{
-//  		if (lin[p] != col[p])
-//		{
-//			if (xlinha[i] > 0.0001 && xlinha[i] < 100)
-//			{
-//				i_l[p] = (v_n[lin[p]-1]-v_n[col[p]-1])/xlinha[i];
-//				fprintf(fp3,"%d,%d,%f\n",lin[p], col[p], i_l[p]);
-//				printf("\n\t\t%d-%d: %f",lin[p], col[p], i_l[p]); 
-//			}
-//			i++;
-//		}	
-//  	} 
+	for(v = 0; v < (ta-q); v++)
+  	{
+    	if (!fscanf(file7, "%f", &xlinha[v]))
+    	break; 
+    	//printf("%f ", xlinha[v]);
+  	}
+  	
+  	if (tipo == 3)
+	{
+	int i = 0;
+	printf("\n\tCorrente de falta nas linhas:");
+	for(p = 0; p < ta; p++)
+  	{
+  		if (lin[p] != col[p])
+		{
+			if (xlinha[i] > 0.0001 && xlinha[i] < 100)
+			{
+				i_l[p] = (v_n[lin[p]-1]-v_n[col[p]-1])/xlinha[i];
+				fprintf(fp3,"%d,%d,%f\n",lin[p], col[p], i_l[p]);
+				printf("\n\t\t%d-%d: %f",lin[p], col[p], i_l[p]); 
+			}
+			i++;
+		}	
+  	}
+  	}
+
+	   
 	fclose(fp1);
 	fclose(fp2);
 	fclose(fp3);
