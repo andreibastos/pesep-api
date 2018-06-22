@@ -239,12 +239,12 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 	FILE *file10 = fopen("tipo_traf.txt", "r");
 	FILE *file11 = fopen("local_tipo_traf.txt", "r");
 	int v, p, local, barra, linha1, linha2, tipo, porc_linha, tipo_trafo[10], local_tipo_trafo[10];
-	float tensao[10], angulo[10], i_f, v_n[10], v_n_zero[10], v_n_n[10], v_n_g[10], v_n_zero_g[10],  i_n_n[10], i_n_g[10], i_n_zero_g[10], i_l[10], a_n_g[10], a_n_zero[10], xlinha[100], xlinhatraf[100], res_ate, res_zero, dados_falta[7], sus_zero[100];
+	float tensao[10], angulo[10], i_f, v_n[10], v_n_zero[10], v_n_n[10], v_n_g[10], v_n_zero_g[10],  i_l_n[10], i_l_zero[10], i_l_zero_g[10], i_l_g[10], i_l[10], a_n_g[10], a_n_zero[10], xlinha[100], xlinhatraf[100], res_ate, res_zero, dados_falta[7], sus_zero[100], i_f_n[10], i_f_zero[10], i_f_n2, i_f_zero2, i_f_g, i_f_g_zero, a_f_g;
 	for(v = 0; v <= 8; v++)
   	{
     if (!fscanf(file4, "%f", &dados_falta[v]))
     break; 
-//    	printf("%f ", dados_falta[v]);
+	//printf("%f ", dados_falta[v]);
   	}
 
   	local = dados_falta[0];
@@ -286,13 +286,13 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     		i_f = tensao[barra-1]/((imp[barra-1][barra-1])+res_ate);
     		fprintf(fp1, "%f,%f,%f", i_f,i_f,i_f);
     		printf("\nDados de saida:");
-			printf("\n\tCorrente de falta: %f A", i_f);
+			printf("\n\tCorrente de falta: %f", i_f);
 			printf("\n\tTensoes pos-falta:");
 			for(p = 0; p < q; p++)
   			{
 				v_n[p] = tensao[barra-1]*(1-imp[p][barra-1]/((imp[barra-1][barra-1])+res_ate));
 				fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
-				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
+				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
   			} 	
 		}
 		
@@ -357,9 +357,9 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 			{
 				printf("\n\t Falta monofasica\n");
 				i_f = 3*(tensao[barra-1]/(2*(imp[barra-1][barra-1])+imp_zero[barra-1][barra-1]));
-    			fprintf(fp1, "%f", i_f);
+    			fprintf(fp1, "%f", i_f,0, i_f,0, i_f,0);
 				printf("\nDados de saida:");
-				printf("\n\tCorrente de falta: %f A", i_f);
+				printf("\n\tCorrente de falta: %f (para as 3 fases))", i_f);
 				printf("\n\tTensoes pos-falta:");
 				for(p = 0; p < q; p++)
   				{
@@ -372,10 +372,50 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 					a_n_zero[p] = 0;
 					a_n_g[p] = (180/3.14)*atan((-v_n_zero[p]+v_n[p]+v_n_n[p])/-(v_n_zero[p]+v_n[p]))+180;
 					v_n_g[p] = sqrt ((v_n_zero[p]-(v_n[p]+v_n_n[p])/2)*(v_n_zero[p]-(v_n[p]+v_n_n[p])/2)+((-sqrt(3)/2)*(v_n[p]-v_n_n[p]))*((-sqrt(3)/2)*(v_n[p]-v_n_n[p])));
-					printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], -a_n_g[p]);
+					printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], -a_n_g[p]);
 					fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], -a_n_g[p]);
   				} 
 			}
+			
+			if (tipo == 2)							//Falta bifásica
+			{
+				if (res_ate == 0)					//Falta bifásica sem terra
+				{
+				printf("\n\t Falta bifasica sem terra\n");
+				i_f = tensao[barra-1]/(2*imp[barra-1][barra-1]);
+    			fprintf(fp1, "%f,%f,180,%f,0", 0, i_f*sqrt(3), -i_f*sqrt(3));
+				printf("\nDados de saida:");
+				printf("\n\tCorrente de falta: \n\t\tIfa %fL0\n\t\tIfb %fL180\n\t\tIfc %fL0", 0, i_f*sqrt(3), -i_f*sqrt(3));
+				printf("\n\tTensoes pos-falta:");
+				for(p = 0; p < q; p++)
+  				{
+					v_n_zero[p] = 0;
+					v_n[p] = tensao[barra-1]-imp[barra-1][p]*i_f;
+					v_n_n[p] = v_n[p];
+					//printf("\n\t\t%f  %f  %f", v_n_zero[p], v_n[p], v_n_n[p]);
+					v_n_zero_g[p] = v_n_zero[p] + v_n[p] + v_n_n[p];
+					//printf("\n\t\t%f", v_n_zero_g[p]);
+					a_n_zero[p] = 0;
+					a_n_g[p] = 180;
+					v_n_g[p] = sqrt ((v_n_zero[p]-(v_n[p]+v_n_n[p])/2)*(v_n_zero[p]-(v_n[p]+v_n_n[p])/2)+((-sqrt(3)/2)*(v_n[p]-v_n_n[p]))*((-sqrt(3)/2)*(v_n[p]-v_n_n[p])));
+					printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], a_n_g[p]);
+					fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], a_n_g[p]);
+  				}
+				} 
+				if (res_ate != 0) //Falta bifásica com terra
+				{
+					printf("\n\t Falta bifasica com terra");	
+					i_f = tensao[barra-1]/(imp[barra-1][barra-1]+(imp[barra-1][barra-1]*imp_zero[barra-1][barra-1])/(imp[barra-1][barra-1]+imp_zero[barra-1][barra-1]));
+					i_f_n2 = (-i_f*imp_zero[barra-1][barra-1])/(imp[barra-1][barra-1]+imp_zero[barra-1][barra-1]);
+					i_f_zero2 = (-i_f*imp[barra-1][barra-1])/(imp[barra-1][barra-1]+imp_zero[barra-1][barra-1]);
+					i_f_g_zero = i_f+i_f_n2+i_f_zero2;
+					i_f_g = sqrt ((i_f_zero2-(i_f+i_f_n2)/2)*(i_f_zero2-(i_f+i_f_n2)/2)+((-sqrt(3)/2)*(i_f-i_f_n2))*((-sqrt(3)/2)*(i_f-i_f_n2)));
+					a_f_g = (180/3.14)*atan((-sqrt(3)/2)*(i_f-i_f_n2)/(i_f_zero2-(i_f+i_f_n2)/2))+90;
+					fprintf(fp1, "0,0,%f,%f,%f,%f", i_f_g,a_f_g,i_f_g,180-a_f_g);
+					printf("\n\tCorrente de falta: \n\t\tIfa 0L0\n\t\tIfb %fL%f\n\t\tIfc %fL%f", i_f_g,a_f_g,i_f_g,180-a_f_g);
+				}					
+			}
+			
 
 		}	
 	}
@@ -402,7 +442,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
   			{
 				v_n[p] = (tensao[linha1-1]-tensao[linha2-1])*(1-imp[p][linha1-1]/((imp[linha1-1][linha2-1])+res_ate));
 				fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
-				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f V\n \t\t\tVb:%fL%f V\n \t\t\tVc:%fL%f V\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
+				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
   			} 	
 		}
 	}
@@ -414,10 +454,38 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     	//printf("%f ", xlinha[v]);
   	}
   	
+  	printf("\n\tCorrente de falta nas linhas:");
+  	
+	if (tipo == 1 || tipo == 2)
+	{
+		xlinha[q] = xlinha[q-2];
+	for(p = 0; p < q; p++)
+  	{
+  		if (p == q-1){
+		xlinha[p] = xlinha[p-2]+res_ate;
+		}
+		i_l[p] = (tensao[p]-v_n[p])/xlinha[p];
+		//printf("\n\t%f-%f/%f-%f", tensao[p], v_n[p], xlinha[p], i_l[p]);
+		i_l_n[p] = -v_n_n[p]/xlinha[p];
+		//printf("\n\t%f/%f-%f", v_n_n[p], xlinha[p], i_l_n[p]);
+		if (p == q-1){
+			xlinha[p] = xlinha[p-1];
+		}
+		i_l_zero[p] = -v_n_zero[p]/xlinha[p];
+		i_l_zero_g[p] = i_l_zero[p] + i_l[p] + i_l_n[p];
+		a_n_zero[p] = 0;
+		a_n_g[p] = (180/3.14)*atan((-i_l_zero[p]+i_l[p]+i_l_n[p])/-(i_l_zero[p]+i_l[p]))+180;	
+		i_l_g[p] = sqrt((i_l_zero[p]-(i_l[p]+i_l_n[p])/2)*(i_l_zero[p]-(i_l[p]+i_l_n[p])/2)+((-sqrt(3)/2)*(i_l[p]-i_l_n[p]))*((-sqrt(3)/2)*(i_l[p]-i_l_n[p])));
+		if (p != 0){
+		printf("\n\t\tLinhas %d-%d\n\t\t\tIa:%f\n \t\t\tIb:%f\n \t\t\tIc:%f\n", p, p+1, i_l_zero_g[p], i_l_g[p], i_l_g[p]);
+		fprintf(fp3, "%d-%d,%f %f, %f %f, %f %f\n", p, p+1, i_l_zero_g[p], i_l_g[p], i_l_g[p]);
+	}
+  	}
+  	}
+  	
   	if (tipo == 3)
 	{
 	int i = 0;
-	printf("\n\tCorrente de falta nas linhas:");
 	for(p = 0; p < ta; p++)
   	{
   		if (lin[p] != col[p])
