@@ -31,7 +31,6 @@ route_default_config = route_default + "config"
 cors = CORS(app, resources={route_default_calcules+"/*": {"origins": "*"}})
 
 
-
 ####################### Funções comuns #######################################
 def datetime_to_timestamp(dt):
     timestamp = (dt - datetime.datetime(1970, 1, 1)).total_seconds()
@@ -39,8 +38,10 @@ def datetime_to_timestamp(dt):
 
 ####################### Classes #############################################
 
+
 class InvalidUsage(Exception):
     status_code = 400  # codigo padrão de erro
+
     def __init__(self, message_error, status_code=None, payload=None):
         Exception.__init__(self)
         self.message_error = message_error
@@ -57,6 +58,8 @@ class InvalidUsage(Exception):
         return rv
 
 ######################## Erros ###############################################
+
+
 @app.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
     response = jsonify(error.to_dict())
@@ -66,6 +69,8 @@ def handle_invalid_usage(error):
 ######################## Rotas ###############################################
 ########### cálculos #######################################################
 # Fluxo de Potência
+
+
 @app.route(route_default_calcules+"/power_flow", methods=['POST', 'GET'])
 def power_flow():
     try:
@@ -74,8 +79,32 @@ def power_flow():
                 try:
                     bus = request.json["barras"]
                     line = request.json["linhas"]
+                    print(bus)
+                    print(line)
                     flow = calcule_power_flow(line, bus)
-                    resp = Response(json.dumps(flow), status=200,
+                    # resp = Response(json.dumps(flow), status=200,
+                    #                 mimetype='application/json')
+                    resp = Response(json.dumps([]), status=200, mimetype='application/json')
+                    return resp
+
+                except Exception as identifier:
+                    
+                    raise InvalidUsage(identifier.message)
+
+    except Exception as identifier:
+        print(identifier)
+        raise InvalidUsage(identifier.message)
+
+# Curto Circuito
+
+
+@app.route(route_default_calcules+"/short", methods=['POST', 'GET'])
+def short_circuit():
+    try:
+        if request.method == 'POST':
+            if request.headers['Content-Type'] == 'application/json':
+                try:
+                    resp = Response(json.dumps(request.json), status=200,
                                     mimetype='application/json')
                     return resp
 
@@ -85,19 +114,9 @@ def power_flow():
     except Exception as identifier:
         raise InvalidUsage(identifier.message)
 
-# Curto Circuito
-@app.route(route_default_calcules+"/short", methods=['POST'])
-def short_circuit():
-    if request.method == 'POST':
-        if request.headers['Content-Type'] == 'application/json':
-            sistema = request.json
-
-            return json.dumps(request.json)
-        else:
-            return json.dumps({"error": request.headers['Content-Type']})
-
 def verify_consistency(lines, buses):
     return True
+
 
 def calcule_power_flow(lines, buses):
     try:
@@ -107,13 +126,12 @@ def calcule_power_flow(lines, buses):
             power_flow = PowerFlow(lines, buses)
             power_flow.calcule()
             results = power_flow.results
-            print(json.dumps(results, indent=4))
         return results
     except:
         raise
 
 
-########## Configurações
+# Configurações
 @app.route(route_default_config + "/headers")
 def get_headers():
     f = open('./config/headers_files.json', 'r')
@@ -121,9 +139,9 @@ def get_headers():
     resp = Response(json.dumps(HEADERS), status=200,
                     mimetype='application/json')
     f.close()
-    return resp 
+    return resp
 
-######################## Função Principal ######################################    
+
+######################## Função Principal ######################################
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=os.environ.get('port', 5000))
-    
