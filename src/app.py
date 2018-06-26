@@ -8,36 +8,39 @@ describe: main code
 """
 
 ###################### Importações de Pacotes ##########################
-from flask import Flask, jsonify, abort, request, url_for,  make_response, redirect, send_from_directory
-import datetime, json, re, os
+from flask import Response, Flask, jsonify, abort, request, url_for,  make_response, redirect, send_from_directory
+from flask_cors import CORS
+import datetime
+import json
+import re
+import os
 
-import models.barra, models.linha, models.sistema
+from models.power_flow import PowerFlow
 
 ######################### Configurações ##################################
-PESEP_CORE_FOLDER = os.environ.get('PESEP_CORE_FOLDER','~/PESEP/core/')  
 app = Flask(__name__)
 app.debug = True
-app.threaded=True
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 #limitação de 5 MB de arquivo de upload
+app.threaded = True
 app.config['SECRET_KEY'] = 'super-secret'
+
 
 # Caminhos das rotas
 route_default = "/"
 route_default_calcules = route_default + "calcule"
-route_default_user = route_default + "user"
-ALLOWED_EXTENSIONS = set(['txt','csv','json', 'png', 'jpg', 'jpeg'])
+route_default_config = route_default + "config"
+cors = CORS(app, resources={route_default_calcules+"/*": {"origins": "*"}})
+
 
 ####################### Funções comuns #######################################
-def datetime_to_timestamp(dt):    
-    timestamp = (dt - datetime.datetime(1970, 1, 1)).total_seconds()    
+def datetime_to_timestamp(dt):
+    timestamp = (dt - datetime.datetime(1970, 1, 1)).total_seconds()
     return int(timestamp)
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 ####################### Classes #############################################
+
+
 class InvalidUsage(Exception):
-    status_code = 400 #codigo padrão de erro
+    status_code = 400  # codigo padrão de erro
 
     def __init__(self, message_error, status_code=None, payload=None):
         Exception.__init__(self)
@@ -45,6 +48,7 @@ class InvalidUsage(Exception):
         if status_code is not None:
             self.status_code = status_code
         self.payload = payload
+        print(message_error)
 
     def to_dict(self):
         rv = dict(self.payload or ())
@@ -54,47 +58,90 @@ class InvalidUsage(Exception):
         return rv
 
 ######################## Erros ###############################################
+
+
 @app.errorhandler(InvalidUsage)
-def handle_invalid_usage(error):    
+def handle_invalid_usage(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
 
-
 ######################## Rotas ###############################################
 ########### cálculos #######################################################
 # Fluxo de Potência
-@app.route(route_default_calcules+"/flow", methods=['POST','GET'])
+
+
+@app.route(route_default_calcules+"/power_flow", methods=['POST', 'GET'])
 def power_flow():
-    #cria instância da classe sistema
-    sistema = models.sistema.Sistema()   
+    try:
+        if request.method == 'POST':
+            if request.headers['Content-Type'] == 'application/json':
+                try:
+                    bus = request.json["barras"]
+                    line = request.json["linhas"]
+                    print(bus)
+                    print(line)
+                    flow = calcule_power_flow(line, bus)
+                    # resp = Response(json.dumps(flow), status=200,
+                    #                 mimetype='application/json')
+                    resp = Response(json.dumps([]), status=200, mimetype='application/json')
+                    return resp
 
-    #importa barras
-    filename_barra = '../test/models/barra.csv'
-    filename_linha = '../test/models/linha.csv'
-    filename_fluxo = '../test/models/fluxo.csv'
+                except Exception as identifier:
+                    
+                    raise InvalidUsage(identifier.message)
 
-    sistema.ImportarSistema(filename_barra, filename_linha)
-
-    fluxoPotencias  = sistema.CalcularFluxoPotencia()
-
-    output = {"fluxo":[fluxoPotencia.to_dict() for fluxoPotencia in fluxoPotencias] , "sistema":sistema.to_dict()}
-
-    return json.dumps(output)
-
-
+    except Exception as identifier:
+        print(identifier)
+        raise InvalidUsage(identifier.message)
 
 # Curto Circuito
-@app.route(route_default_calcules+"/short", methods=['POST'])
+
+
+@app.route(route_default_calcules+"/short", methods=['POST', 'GET'])
 def short_circuit():
-    pass
-    
+    try:
+        if request.method == 'POST':
+            if request.headers['Content-Type'] == 'application/json':
+                try:
+                    resp = Response(json.dumps(request.json), status=200,
+                                    mimetype='application/json')
+                    return resp
+
+                except Exception as identifier:
+                    raise InvalidUsage(identifier.message)
+
+    except Exception as identifier:
+        raise InvalidUsage(identifier.message)
+
+def verify_consistency(lines, buses):
+    return True
 
 
+def calcule_power_flow(lines, buses):
+    try:
+        results = []
+        consistency = verify_consistency(lines, buses)
+        if consistency:
+            power_flow = PowerFlow(lines, buses)
+            power_flow.calcule()
+            results = power_flow.results
+        return results
+    except:
+        raise
 
+
+# Configurações
+@app.route(route_default_config + "/headers")
+def get_headers():
+    f = open('./config/headers_files.json', 'r')
+    HEADERS = json.load(f)
+    resp = Response(json.dumps(HEADERS), status=200,
+                    mimetype='application/json')
+    f.close()
+    return resp
 
 
 ######################## Função Principal ######################################
-if __name__ == '__main__':   
-    app.run(host="0.0.0.0", port = os.environ.get('port', 5000))
-    
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=os.environ.get('port', 5000))

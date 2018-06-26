@@ -1,3 +1,0 @@
-option ampl_id (_pid);
-shell 'kestrel retrieve kestrel';
-solution kestrel.sol;

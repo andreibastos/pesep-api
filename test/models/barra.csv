@@ -1,5 +1,5 @@
-#Item,Tipo,Nome,Tens√£o0,Angulo0,Pgerada,Qgerada,Qm√≠nimo,Qm√°ximo,Pcarga,Qcarga,Pgeradam√≠n,Pgeradam√°x,Qshunt
-1,2,PV,1.05,0,60,0,0,60,0,0,0,60,0
-2,0,PQ,1,0,0,0,0,0,-50,-20,0,0,0
-3,0,PQ,1,0,0,0,0,0,-60,-10,0,0,0
-4,3,VO,1,0,0,0,0,100,0,0,0,100,0
+#Item,Tipo,Nome,Tens„o0,Angulo0,Pgerada,Qgerada,QmÌnimo,Qm·ximo,Pcarga,Qcarga,PgeradamÌn,Pgeradam·x,Qshunt
+1,3,Barra_1,1,0,0,0,0,200,65,30,0,300,3.6,3.33
+2,2,Barra_2,1,0,0,0,0,0,115,60,0,0,3.6,3.33
+3,2,Barra_3,1,0,180,0,0,200,70,40,0,300,8.2,3.33
+4,2,Barra_4,1,0,0,0,0,0,70,70,0,0,7.15,0

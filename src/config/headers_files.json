@@ -1,0 +1,116 @@
+{
+    "line": [
+        {
+            "name": "branch_item",
+            "translate": "Item",
+            "unit":""
+        },
+        {
+            "name": "fbus",
+            "translate": "da Barra",
+            "unit":""
+        },
+        {
+            "name": "tBus",
+            "translate": "para Barra",
+            "unit":""
+        },
+        {
+            "name": "branch_r",
+            "translate": "Resistência (r)",
+            "unit":"Ω"
+        },
+        {
+            "name": "branch_x",
+            "translate": "Impedância (x)",
+            "unit":"Ω"
+        },
+        {
+            "name": "branch_tap",
+            "translate": "Tap do Transformador",
+            "unit":"pu"
+        },
+        {
+            "name": "branch_def",
+            "translate": "Ângulo do Transformador",
+            "unit":"Grau"
+        }
+    ],
+    "bus": [
+        {
+            "name":"bus_item",
+            "translate":"Item",
+            "unit":""
+        },
+        {
+            "name": "bus_type",
+            "translate": "Tipo",
+            "unit":""
+        },
+        {
+            "name": "bus_name",
+            "translate": "Nome",
+            "unit":""
+        },
+        {
+            "name": "bus_voltage0",
+            "translate": "Tensão Inicial",
+            "unit":"V"
+        },
+        {
+            "name": "bus_angle0",
+            "translate": "Ângulo Inicial", 
+            "unit":"θ"
+        },
+        {
+            "name": "bus_p_gen0",
+            "translate": "Potência Ativa Gerada (P)",
+            "unit":"W"
+        },
+        {
+            "name": "bus_q_gen",
+            "translate": "Potência Reativa Gerada (Q)",
+            "unit":"VAr"
+        },
+        {
+            "name": "bus_q_min",
+            "translate": "Potência Reativa Mínima",
+            "unit":"VAr"
+        },
+        {
+            "name": "bus_q_max",
+            "translate": "Potência Reativa Máxima",
+            "unit":"VAr"
+        },
+        {
+            "name": "bus_p_load",
+            "translate": "Potência Ativa Carga",
+            "unit":"W"
+        },
+        {
+            "name": "bus_q_load",
+            "translate": "Potência Reativa Carga",
+            "unit":"VAr"
+        },
+        {
+            "name": "bus_p_gen_min",
+            "translate": "Potência Ativa Gerada Mínima",
+            "unit":"W"
+        },
+        {
+            "name": "bus_p_gen_max",
+            "translate": "Potência Ativa Gerada Máxima",
+            "unit":"W"
+        },
+        {
+            "name": "bus_q_shunt",
+            "translate": "Potência Reativa Shunt",
+            "unit":"VAr"
+        },
+        {
+            "name": "bus_x",
+            "translate": "Impedância Interna",
+            "unit":"Ω"
+        }
+    ]
+}
