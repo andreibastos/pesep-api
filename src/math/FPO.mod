@@ -10,7 +10,7 @@ param bus_type       {BUS};				# Tipo (3-Slack 2-PV 0-PQ)
 param bus_name       {BUS} symbolic;	# Nome 
 param bus_voltage0   {BUS};				# Tensão inicial: As PQs serão 1
 param bus_angle0     {BUS};				# Ângulo inicial: As PQs e PVs serão 0
-param bus_p_gen0     {BUS};			    # Potência ativa do gerador
+param bus_p_gen0     {BUS};			  # Potência ativa do gerador
 param bus_q_gen      {BUS};				# Potência reativa do gerador
 param bus_q_min      {BUS};				# Potência reativa mínima
 param bus_q_max      {BUS};				# Potência reativa máxima
@@ -19,7 +19,7 @@ param bus_q_load     {BUS};				# Potência reativa da carga
 param bus_p_gen_min  {BUS};				# Potência ativa mínima no gerador
 param bus_p_gen_max  {BUS};				# Potência ativa máxima no gerador
 param bus_q_shunt    {BUS};				# Potência reativa do shunt em cada barra
-param bus_x    		 {BUS};				# Reatância da barra
+param bus_x    		   {BUS};				# Reatância da barra
 
 # Dados das linhas
 
@@ -28,8 +28,11 @@ param branch_r       {BRANCH};			# Resistência
 param branch_x       {BRANCH};			# Indutância
 param branch_tap     {BRANCH};			# Razão de transformação
 param branch_def     {BRANCH};			# Angulo de defasamento
+param branch_x_traf  {BRANCH};		    # Impedância do transformador
+param branch_res_zero{BRANCH};		    # Resistência da linha de seguência zero
 param branch_g       {(l,k,m) in BRANCH} := branch_r[l,k,m]/(branch_r[l,k,m]^2+branch_x[l,k,m]^2); # Condutância
-param branch_b       {(l,k,m) in BRANCH} :=-branch_x[l,k,m]/(branch_r[l,k,m]^2+branch_x[l,k,m]^2); # Susceptância
+param branch_b       {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m])^2); # Susceptância
+param branch_b_zero  {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m]+branch_res_zero[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m]+branch_res_zero[l,k,m])^2); # Susceptância de sequência zero
 
 # Dados nominais
 
@@ -69,6 +72,12 @@ if(k == m) then (sum{(l,k,i) in BRANCH} (branch_b[l,k,i]*branch_tap[l,k,i]^2)
                                 + sum{(l,i,k) in BRANCH} (branch_b[l,i,k])-bus_x[k])
 else if(k != m) then (sum{(l,k,m) in BRANCH} (branch_g[l,k,m]*sin(branch_def[l,k,m])-branch_b[l,k,m]*cos(branch_def[l,k,m]))*branch_tap[l,k,m]
                      +sum{(l,m,k) in BRANCH} (-branch_g[l,m,k]*sin(branch_def[l,m,k])-branch_b[l,m,k]*cos(branch_def[l,m,k]))*branch_tap[l,m,k]);
+
+param B_zero{(k,m) in YBUS} =		# Monta o vetor de susceptância para o fluxo de potência
+if(k == m) then (sum{(l,k,i) in BRANCH} (branch_b_zero[l,k,i]*branch_tap[l,k,i]^2)
+                                + sum{(l,i,k) in BRANCH} (branch_b_zero[l,i,k])-bus_x[k])
+else if(k != m) then (sum{(l,k,m) in BRANCH} (branch_g[l,k,m]*sin(branch_def[l,k,m])-branch_b_zero[l,k,m]*cos(branch_def[l,k,m]))*branch_tap[l,k,m]
+                     +sum{(l,m,k) in BRANCH} (-branch_g[l,m,k]*sin(branch_def[l,m,k])-branch_b_zero[l,m,k]*cos(branch_def[l,m,k]))*branch_tap[l,m,k]);
 
 # Função objetivo
 
@@ -252,6 +261,11 @@ for{(l,k,m) in BRANCH} {
 		printf "%f ", B[k,m] > sus.txt;
 	}
 
+# Gera o arquivo da matriz de susceptâncias para o Curto Circuito
+  for {(k,m) in YBUS }{
+		printf "%f ", B_zero[k,m] > sus_zero.txt;
+	}
+
 # Gera o arquivo da coluna para o Curto Circuito
   for {(k,m) in YBUS }{
     printf "%d ", k > coluna.txt;
@@ -265,4 +279,9 @@ for{(l,k,m) in BRANCH} {
 # Gera o arquivo da matriz de susceptâncias para o Curto Circuito
   for {(l,k,m) in BRANCH }{
 		printf "%f ", branch_x[l,k,m] > x_linha.txt;
+  }
+
+# Gera o arquivo das impedâncias dos transformadores para o Curto Circuito mono e bifásico
+  for {(l,k,m) in BRANCH }{
+		printf "%f ", branch_x_traf[l,k,m] > x_linha_traf.txt;
   }

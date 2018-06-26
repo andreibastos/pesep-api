@@ -1,0 +1,9 @@
+param Sbase := 100; # Em MW
+
+param: BUS: bus_type bus_name bus_voltage0 bus_angle0 bus_p_gen0 bus_q_gen
+            bus_q_min bus_q_max bus_p_load bus_q_load bus_p_gen_min
+			bus_p_gen_max bus_q_shunt bus_x:=
+include  barra.csv;
+
+param: BRANCH: branch_r branch_x branch_tap branch_def branch_x_traf branch_res_zero branch_traf:=
+include  linha.csv;
