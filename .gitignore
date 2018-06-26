@@ -6,12 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
-ampl/
-tmp/
-
 # Distribution / packaging
 .Python
-include/
+[Ii]nclude/
 env/
 share/
 bin/
@@ -22,10 +19,12 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+[Ll]ib/
 lib64/
 parts/
+[Ss]cripts/
 sdist/
+[Tt]lc
 var/
 wheels/
 *.egg-info/
@@ -107,7 +106,11 @@ ENV/
 # mypy
 .mypy_cache/
 
+\.vscode/
+src/tweets.csv
 
-src/math/AMPL/
+src/math/AMPL
 
 
+src/math/*.exe
+src/math/Core
