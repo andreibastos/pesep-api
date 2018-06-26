@@ -3,14 +3,14 @@ set BUS;    										# Barras
 set BRANCH within {1..4000} cross BUS cross BUS; 	# Linhas (Guarda os índices e barra de partida e chegada)
 
 # Arquivo de solução
-option solver './MINOS';				#Escolhe o MINOS como solver
+option solver '../../../ampl/minos';				#Escolhe o MINOS como solver
 
 # Dados das barras
 param bus_type       {BUS};				# Tipo (3-Slack 2-PV 0-PQ)
 param bus_name       {BUS} symbolic;	# Nome 
 param bus_voltage0   {BUS};				# Tensão inicial: As PQs serão 1
 param bus_angle0     {BUS};				# Ângulo inicial: As PQs e PVs serão 0
-param bus_p_gen0     {BUS};			  # Potência ativa do gerador
+param bus_p_gen0     {BUS};			    # Potência ativa do gerador
 param bus_q_gen      {BUS};				# Potência reativa do gerador
 param bus_q_min      {BUS};				# Potência reativa mínima
 param bus_q_max      {BUS};				# Potência reativa máxima
@@ -19,7 +19,7 @@ param bus_q_load     {BUS};				# Potência reativa da carga
 param bus_p_gen_min  {BUS};				# Potência ativa mínima no gerador
 param bus_p_gen_max  {BUS};				# Potência ativa máxima no gerador
 param bus_q_shunt    {BUS};				# Potência reativa do shunt em cada barra
-param bus_x    		   {BUS};				# Reatância da barra
+param bus_x    		 {BUS};				# Reatância da barra
 
 # Dados das linhas
 
@@ -30,6 +30,7 @@ param branch_tap     {BRANCH};			# Razão de transformação
 param branch_def     {BRANCH};			# Angulo de defasamento
 param branch_x_traf  {BRANCH};		    # Impedância do transformador
 param branch_res_zero{BRANCH};		    # Resistência da linha de seguência zero
+param branch_traf	 {BRANCH};			# Tipo de transformador: 1-DY e 2-YY
 param branch_g       {(l,k,m) in BRANCH} := branch_r[l,k,m]/(branch_r[l,k,m]^2+branch_x[l,k,m]^2); # Condutância
 param branch_b       {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m])^2); # Susceptância
 param branch_b_zero  {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m]+branch_res_zero[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m]+branch_res_zero[l,k,m])^2); # Susceptância de sequência zero
@@ -232,7 +233,7 @@ for{(l,k,m) in BRANCH} {
 
 # Gera o arquivo de saída
 
-  printf "Barra,Nome,Tensão,Angulo,Pgerada,Qgerada,Pcarga,Qcarga,Para,P_fluxo,Q_fluxo\n" > fluxo.csv;
+  printf "id_barra,nome,tensao_0,angulo_0,pGerada,qGerada,pCarga,qCarga,para,pFluxo,qFluxo\n" > fluxo.csv;
   for{i in BUS} {
   printf "%d,%s,%f,%f,%f,%f,%f,%f,,,,\n", i, bus_name[i], bus_voltage[ i], bus_angle[i]*180/3.14159,
     p_g[i]*Sbase, q_g[i]*Sbase, bus_p_load[i]*Sbase, bus_q_load[i]*Sbase > fluxo.csv;
@@ -284,4 +285,14 @@ for{(l,k,m) in BRANCH} {
 # Gera o arquivo das impedâncias dos transformadores para o Curto Circuito mono e bifásico
   for {(l,k,m) in BRANCH }{
 		printf "%f ", branch_x_traf[l,k,m] > x_linha_traf.txt;
+  }
+
+  # Gera o arquivo das impedâncias dos transformadores para o Curto Circuito mono e bifásico
+  for {(l,k,m) in BRANCH}{
+		printf "%d ", branch_traf[l,k,m] > tipo_traf.txt;
+  }
+
+  # Gera o arquivo das impedâncias dos transformadores para o Curto Circuito mono e bifásico
+  for {(l,k,m) in BRANCH}{
+		printf "%d ", m > local_tipo_traf.txt;
   }
