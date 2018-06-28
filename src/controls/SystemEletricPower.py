@@ -12,6 +12,8 @@ import subprocess
 import datetime
 import time
 
+# comandos
+COMMAND_COMPILE = "g++ ./math/CC/CC.cpp -o ../dist/CC"
 COMMAND_POWER_FLOW = "./FPO.sh"
 COMMAND_SHORT_CIRCUIT = "./CC.sh"
 
@@ -159,3 +161,12 @@ def remove_inputs(results, input_files):
 
     for key in keys_remove:
         results.pop(key, None)
+
+def compile_CC():
+    try:
+        os.mkdir("../dist")
+    except:
+        pass
+
+    process = subprocess.Popen(COMMAND_COMPILE, shell=True)
+    output, error = process.communicate()
