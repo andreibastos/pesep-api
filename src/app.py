@@ -15,7 +15,7 @@ import json
 import re
 import os
 
-from controls.SystemEletricPower import calcule, compile_CC
+from controllers.SystemEletricPower import calcule, compile_CC
 
 ######################### Configurações ##################################
 app = Flask(__name__)
@@ -70,6 +70,12 @@ class InvalidUsage(Exception):
         return rv
 
 ######################## Erros ###############################################
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return Response(json.dumps({'message_error': 'not exist.  please usage: /calcule/power_flower or /calcule/short_circuit ', 'code': 404, 'error': True}), status=404,
+                    mimetype='application/json')
 
 
 @app.errorhandler(InvalidUsage)
