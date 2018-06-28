@@ -111,7 +111,7 @@ src/tweets.csv
 
 src/math/AMPL
 
-
+tmp/
 src/math/*.exe
 src/math/Core
 

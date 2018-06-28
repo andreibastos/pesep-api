@@ -12,7 +12,7 @@ import datetime
 import hashlib
 import shutil
 
-COMMAND_AMPL = "./solve_fpo_ampl.sh"
+COMMAND_AMPL = "./FPO.sh"
 
 
 class PowerFlow():
@@ -48,7 +48,7 @@ class PowerFlow():
             self.execute_ampl()
 
             self.load_files()
-            # self.remove_temps()
+            self.remove_temps()
         except Exception as error:
             print error
 

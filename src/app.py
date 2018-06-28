@@ -16,6 +16,8 @@ import re
 import os
 
 from models.power_flow import PowerFlow
+from models.short_circuit import compile_CC
+from models.generic import calcule
 
 ######################### Configurações ##################################
 app = Flask(__name__)
@@ -28,7 +30,7 @@ app.config['SECRET_KEY'] = 'super-secret'
 route_default = "/"
 route_default_calcules = route_default + "calcule"
 route_default_config = route_default + "config"
-cors = CORS(app, resources={route_default_calcules+"/*": {"origins": "*"}})
+cors = CORS(app, resources={"/*": {"origins": "*"}})
 
 
 ####################### Funções comuns #######################################
@@ -37,8 +39,6 @@ def datetime_to_timestamp(dt):
     return int(timestamp)
 
 ####################### Classes #############################################
-
-
 class InvalidUsage(Exception):
     status_code = 400  # codigo padrão de erro
 
@@ -77,11 +77,16 @@ def power_flow():
         if request.method == 'POST':
             if request.headers['Content-Type'] == 'application/json':
                 try:
-                    bus = request.json["barras"]
-                    line = request.json["linhas"]
-                    print(bus)
-                    print(line)
-                    flow = calcule_power_flow(line, bus)
+
+                    buses = request.json["barras"]
+                    lines = request.json["linhas"]
+                    print(request.json)
+                    flow = calcule('power_flow', 
+                    [
+                        {'filename':'linha.csv', 'data':lines}, 
+                        {'filename':'barra.csv', 'data':buses}, 
+                    ])
+
                     resp = Response(json.dumps(flow), status=200,
                                     mimetype='application/json')
                     # resp = Response(json.dumps([]), status=200, mimetype='application/json')
@@ -120,7 +125,7 @@ def verify_consistency(lines, buses):
 
 def calcule_power_flow(lines, buses):
     try:
-        results = []
+        results = {}
         consistency = verify_consistency(lines, buses)
         if consistency:
             power_flow = PowerFlow(lines, buses)
@@ -144,4 +149,5 @@ def get_headers():
 
 ######################## Função Principal ######################################
 if __name__ == '__main__':
+    # compile_CC()
     app.run(host="0.0.0.0", port=os.environ.get('port', 5000))
