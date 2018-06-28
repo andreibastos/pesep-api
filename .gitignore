@@ -114,3 +114,5 @@ src/math/AMPL
 
 src/math/*.exe
 src/math/Core
+
+ampl/
