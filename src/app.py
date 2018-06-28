@@ -80,8 +80,8 @@ def power_flow():
 
                     buses = request.json["barras"]
                     lines = request.json["linhas"]
-                    print(request.json)
-                    flow = calcule('power_flow', 
+                    flow = calcule(
+                        'power_flow', 
                     [
                         {'filename':'linha.csv', 'data':lines}, 
                         {'filename':'barra.csv', 'data':buses}, 

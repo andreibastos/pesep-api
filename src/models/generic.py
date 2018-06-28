@@ -19,7 +19,7 @@ COMMAND_SHORT_CIRCUIT = "./CC.sh"
 def calcule(math_method, inputs):
     command = ""
     results = {}
-
+    
     if (math_method == 'power_flow'):
         command = COMMAND_POWER_FLOW
     else:
@@ -29,17 +29,23 @@ def calcule(math_method, inputs):
     try:
 
         directory = create_directory(math_method)
-
+        print ('creating {0}'.format(directory))
+        
         save_files(inputs, directory)
+
         input_files = os.listdir(directory)
+        print ('saving inputs {0}'.format(", ".join(input_files)))
 
         execute_command(command, directory)
+        print ('executing {0}'.format(command))
 
         results = load_files(directory)
 
         remove_inputs(results, input_files)
+        print ('results: {0} files'.format(len(results)))
 
         remove_temps(directory)
+        print('removing {0}'.format(directory))
     except Exception as error:
         print error
 
@@ -47,6 +53,11 @@ def calcule(math_method, inputs):
 
 
 def create_directory(math_method):
+    try:
+        os.mkdir("tmp")
+    except Exception as e:
+        pass
+
     directory_temp = "tmp/"+math_method
     try:
         os.mkdir(directory_temp)
