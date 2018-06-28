@@ -82,9 +82,9 @@ def power_flow():
                     print(bus)
                     print(line)
                     flow = calcule_power_flow(line, bus)
-                    # resp = Response(json.dumps(flow), status=200,
-                    #                 mimetype='application/json')
-                    resp = Response(json.dumps([]), status=200, mimetype='application/json')
+                    resp = Response(json.dumps(flow), status=200,
+                                    mimetype='application/json')
+                    # resp = Response(json.dumps([]), status=200, mimetype='application/json')
                     return resp
 
                 except Exception as identifier:
