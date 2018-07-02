@@ -13,7 +13,7 @@ import datetime
 import time
 
 # comandos
-COMMAND_COMPILE = "g++ ./math/CC/CC.cpp -o ../dist/CC"
+COMMAND_COMPILE = "./compile.sh"
 COMMAND_POWER_FLOW = "./FPO.sh"
 COMMAND_SHORT_CIRCUIT = "./CC.sh"
 
@@ -42,12 +42,12 @@ def calcule(math_method, inputs):
         print ('executing {0}'.format(command))
 
         results = load_files(directory)
-
-        remove_inputs(results, input_files)
         print ('results: {0} files'.format(len(results)))
 
-        remove_temps(directory)
-        print('removing {0}'.format(directory))
+        # remove_inputs(results, input_files)
+
+        # remove_temps(directory)
+        # print('removing {0}'.format(directory))
     except Exception as error:
         print error
 
@@ -125,6 +125,7 @@ def remove_temps(directory):
 def load_files(directory):
     results = {}
     files = os.listdir(directory)
+    files = sorted(files)
     for file in files:
         filename = os.path.join(directory, file)
         results[file] = load_file(filename)
@@ -137,15 +138,16 @@ def load_file(filename):
     if os.path.exists(filename):
         with open(filename, 'r') as f:
             lines = f.readlines()
-            first_line = lines[0]
-            count_comma = len(first_line.strip().split(","))
-            count_space = len(first_line.strip().split(" "))
-            if (count_space > count_comma):
-                delimiter = ' '
-            file_loaded = [x.strip().split(delimiter) for x in lines ]
-            for line in file_loaded:
-                for column in line:
-                    column = column.decode("utf-8").encode("utf-8")
+            if (len(lines) > 0):
+                first_line = lines[0]
+                count_comma = len(first_line.strip().split(","))
+                count_space = len(first_line.strip().split(" "))
+                if (count_space > count_comma):
+                    delimiter = ' '
+                file_loaded = [x.strip().split(delimiter) for x in lines ]
+                for line in file_loaded:
+                    for column in line:
+                        column = column.decode("utf-8").encode("utf-8")
     return file_loaded
 
 

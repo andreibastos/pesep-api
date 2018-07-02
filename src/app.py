@@ -114,9 +114,21 @@ def power_flow():
 def short_circuit():
     data = get_response_data(request)
     if (data):
-        resp = Response(json.dumps(data), status=200,
-                        mimetype='application/json')
-        return resp
+        try:
+            inputs = []
+            files = ['barra.csv', 'linha.csv', 'entrada_falta.txt']
+            for filename in files:
+                inputs.append({
+                    'filename': filename,
+                    'data': data[filename]
+                })
+            short = calcule('short_circuit', inputs)
+
+            resp = Response(json.dumps(short), status=200,
+                            mimetype='application/json')
+            return resp
+        except Exception as error:
+            raise InvalidUsage(error.message)
     else:
         raise InvalidUsage('not find files')
 
