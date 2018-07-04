@@ -91,14 +91,15 @@ def handle_invalid_usage(error):
 def power_flow():
     data = get_response_data(request)
     if (data):
-        barras = data["barras"]
-        linhas = data["linhas"]
-        flow = calcule(
-            'power_flow',
-            [
-                {'filename': 'linha.csv', 'data': linhas},
-                {'filename': 'barra.csv', 'data': barras},
-            ])
+        inputs = []
+        print(data)
+        files = ['barra.csv', 'linha.csv']
+        for filename in files:
+            inputs.append({
+                'filename': filename,
+                'data': data[filename]
+            })
+        flow = calcule('power_flow', inputs)
 
         resp = Response(json.dumps(flow), status=200,
                         mimetype='application/json')
