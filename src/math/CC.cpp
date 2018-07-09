@@ -22,7 +22,7 @@ int main()
   FILE *file1_zero = fopen("sus_zero.txt", "r");
   FILE *file2 = fopen("coluna.txt", "r");
   FILE *file3 = fopen("linha.txt", "r");
-  
+  ;
 
   float inverse[100][100];
  
