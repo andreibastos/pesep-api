@@ -83,6 +83,15 @@ int main()
     a[linha-1][coluna-1] = sus;
     a_zero[linha-1][coluna-1] = sus_zero;
   }
+  
+//    for (w=0; w < k; w++)
+//  {
+//    for (c=0; c < k; c++)
+//  	{
+//		printf("\t%f", a[w][c]);
+//  	}
+//  	printf("\n");
+//  }
 
   d = determinant(a, k);
   if (d == 0)
@@ -314,7 +323,14 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 			}
 			if (tipo_trafo[0] == 1 && tipo_trafo[barra] == 1)							//Transformadores D-Y
     		{
-  				printf("\tTransformadores D-Y\n");
+  					for(p = 0; p < q; p++) 
+    			{
+    		    	for(v = 0; v < q; v++) 
+    				{
+    					imp_zero[p][v] = 0;
+    				}
+    			}
+				  printf("\tTransformadores D-Y\n");
   				printf("\nMatriz de impedancia de seguencia zero:\n");
     			for(p = 0; p < q; p++) 
     			{
