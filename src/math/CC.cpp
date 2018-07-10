@@ -14,6 +14,7 @@ float determinant(float [][100], float);
 void cofactor(float [][100], float, int[], int[], int);
 void transpose(float [][100], float [][100], float, int[], int[], int);
 void fault (float [100][100], float [100][100], int, int[], int[], int);
+FILE *fp4; 
 
 int main()
 {
@@ -22,6 +23,7 @@ int main()
   FILE *file1_zero = fopen("sus_zero.txt", "r");
   FILE *file2 = fopen("coluna.txt", "r");
   FILE *file3 = fopen("linha.txt", "r");
+  fp4 = fopen("matriz_imp.txt","w");
   ;
 
   float inverse[100][100];
@@ -205,9 +207,12 @@ void transpose(float num[100][100], float fac[100][100], float r, int lin[], int
        {
         inverse_p[i][j] = inverse[i][j];
                 printf("\t%f", inverse_p[i][j]);
+                fprintf(fp4, "\t%f", inverse_p[i][j]);
         }
                 printf("\n");
-    }	
+                fprintf(fp4, "\n");
+    }
+	fprintf(fp4, "\n\n");	
 	}
 	
 	    if (flag == 0){
@@ -335,9 +340,11 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 						{
     						imp_zero[p][v] = xlinhatraf[p] + xlinha[p];
     					}
-						printf("\t%f", imp_zero[p][v]);
+						printf("\t%f ", imp_zero[p][v]);
+						fprintf(fp4, "\t%f", imp_zero[p][v]);
 					}
-					printf("\n");	
+					printf("\n");
+					fprintf(fp4, "\n");	
 				}
 			}
 			if (tipo_trafo[0] == 2 && tipo_trafo[barra] == 2)							//Transformadores Y-Y
@@ -349,8 +356,10 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     				for (v = 0; v < q; v++)
   					{
 	  					printf("\t%f", imp_zero[p][v]);
+	  					fprintf(fp4, "\t%f", imp_zero[p][v]);
 					}
 					printf("\n");
+					fprintf(fp4, "\n");
 				}
 			}
 			if (tipo == 1)							//Falta monofásica
@@ -359,7 +368,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 				i_f = 3*(tensao[barra-1]/(2*(imp[barra-1][barra-1])+imp_zero[barra-1][barra-1]));
     			fprintf(fp1, "%f", i_f,0, i_f,0, i_f,0);
 				printf("\nDados de saida:");
-				printf("\n\tCorrente de falta: %f (para as 3 fases))", i_f);
+				printf("\n\tCorrente de falta: %f (para as 3 fases)", i_f);
 				printf("\n\tTensoes pos-falta:");
 				for(p = 0; p < q; p++)
   				{
@@ -505,6 +514,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 	fclose(fp1);
 	fclose(fp2);
 	fclose(fp3);
+	fclose(fp4);
 }
 
 
