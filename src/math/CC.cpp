@@ -84,14 +84,14 @@ int main()
     a_zero[linha-1][coluna-1] = sus_zero;
   }
   
-//    for (w=0; w < k; w++)
-//  {
-//    for (c=0; c < k; c++)
-//  	{
-//		printf("\t%f", a[w][c]);
-//  	}
-//  	printf("\n");
-//  }
+    for (w=0; w < k; w++)
+  {
+    for (c=0; c < k; c++)
+  	{
+		printf("\t%f", a[w][c]);
+  	}
+  	printf("\n");
+  }
 
   d = determinant(a, k);
   if (d == 0)
@@ -305,7 +305,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 			for(p = 0; p < q; p++)
   			{
 				v_n[p] = tensao[barra-1]*(1-imp[p][barra-1]/((imp[barra-1][barra-1])+res_ate));
-				fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
+				fprintf(fp2, "%d,%f, %f, %f, %f, %f, %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
 				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
   			} 	
 		}
@@ -398,7 +398,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 					a_n_g[p] = (180/3.14)*atan((-v_n_zero[p]+v_n[p]+v_n_n[p])/-(v_n_zero[p]+v_n[p]))+180;
 					v_n_g[p] = sqrt ((v_n_zero[p]-(v_n[p]+v_n_n[p])/2)*(v_n_zero[p]-(v_n[p]+v_n_n[p])/2)+((-sqrt(3)/2)*(v_n[p]-v_n_n[p]))*((-sqrt(3)/2)*(v_n[p]-v_n_n[p])));
 					printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], -a_n_g[p]);
-					fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], -a_n_g[p]);
+					fprintf(fp2, "%d,%f, %f, %f, %f, %f, %f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], -a_n_g[p]);
   				} 
 			}
 			
@@ -424,7 +424,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 					a_n_g[p] = 180;
 					v_n_g[p] = sqrt ((v_n_zero[p]-(v_n[p]+v_n_n[p])/2)*(v_n_zero[p]-(v_n[p]+v_n_n[p])/2)+((-sqrt(3)/2)*(v_n[p]-v_n_n[p]))*((-sqrt(3)/2)*(v_n[p]-v_n_n[p])));
 					printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], a_n_g[p]);
-					fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], a_n_g[p]);
+					fprintf(fp2, "%d,%f, %f, %f, %f, %f, %f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], a_n_g[p]);
   				}
 				} 
 				if (res_ate != 0) //Falta bifásica com terra
@@ -466,7 +466,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 			for(p = 0; p < q; p++)
   			{
 				v_n[p] = (tensao[linha1-1]-tensao[linha2-1])*(1-imp[p][linha1-1]/((imp[linha1-1][linha2-1])+res_ate));
-				fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
+				fprintf(fp2, "%d,%f, %f, %f, %f, %f, %f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);
 				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120);	
   			} 	
 		}
@@ -503,7 +503,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 		i_l_g[p] = sqrt((i_l_zero[p]-(i_l[p]+i_l_n[p])/2)*(i_l_zero[p]-(i_l[p]+i_l_n[p])/2)+((-sqrt(3)/2)*(i_l[p]-i_l_n[p]))*((-sqrt(3)/2)*(i_l[p]-i_l_n[p])));
 		if (p != 0){
 		printf("\n\t\tLinhas %d-%d\n\t\t\tIa:%f\n \t\t\tIb:%f\n \t\t\tIc:%f\n", p, p+1, i_l_zero_g[p], i_l_g[p], i_l_g[p]);
-		fprintf(fp3, "%d-%d,%f %f, %f %f, %f %f\n", p, p+1, i_l_zero_g[p], i_l_g[p], i_l_g[p]);
+		fprintf(fp3, "%d-%d,%f, %f, %f, %f, %f, %f\n", p, p+1, i_l_zero_g[p], i_l_g[p], i_l_g[p]);
 	}
   	}
   	}
