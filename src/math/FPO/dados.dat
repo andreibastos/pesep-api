@@ -1,4 +1,4 @@
-param Sbase := 100; # Em MW
+param Sbase := 1; # Em MW
 
 param: BUS: bus_type bus_name bus_voltage0 bus_angle0 bus_p_gen0 bus_q_gen
             bus_q_min bus_q_max bus_p_load bus_q_load bus_p_gen_min
