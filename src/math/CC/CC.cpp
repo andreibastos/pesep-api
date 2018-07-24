@@ -14,6 +14,7 @@ float determinant(float [][100], float);
 void cofactor(float [][100], float, int[], int[], int);
 void transpose(float [][100], float [][100], float, int[], int[], int);
 void fault (float [100][100], float [100][100], int, int[], int[], int);
+FILE *fp4; 
 
 int main()
 {
@@ -22,7 +23,8 @@ int main()
   FILE *file1_zero = fopen("sus_zero.txt", "r");
   FILE *file2 = fopen("coluna.txt", "r");
   FILE *file3 = fopen("linha.txt", "r");
-  
+  fp4 = fopen("matriz_imp.txt","w");
+  ;
 
   float inverse[100][100];
  
@@ -81,6 +83,15 @@ int main()
     a[linha-1][coluna-1] = sus;
     a_zero[linha-1][coluna-1] = sus_zero;
   }
+  
+//    for (w=0; w < k; w++)
+//  {
+//    for (c=0; c < k; c++)
+//  	{
+//		printf("\t%f", a[w][c]);
+//  	}
+//  	printf("\n");
+//  }
 
   d = determinant(a, k);
   if (d == 0)
@@ -205,9 +216,12 @@ void transpose(float num[100][100], float fac[100][100], float r, int lin[], int
        {
         inverse_p[i][j] = inverse[i][j];
                 printf("\t%f", inverse_p[i][j]);
+                fprintf(fp4, "\t%f", inverse_p[i][j]);
         }
                 printf("\n");
-    }	
+                fprintf(fp4, "\n");
+    }
+	fprintf(fp4, "\n\n");	
 	}
 	
 	    if (flag == 0){
@@ -279,7 +293,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
   	printf("\nDados da falta:");
 	if (local == 1) 									//Falta na barra
     {	
-    	printf("\n\tFalta na barra %d", barra);
+    	printf("\n\tFalta na barra %d\n", barra);
     	if (tipo == 3)							//Falta trifásica
     	{	
     		printf("\n\tTrifasica\n");
@@ -309,13 +323,20 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 			}
 			if (tipo_trafo[0] == 1 && tipo_trafo[barra] == 1)							//Transformadores D-Y
     		{
-  				printf("\tTransformadores D-Y\n");
-  				printf("\nMatriz de impedancia de seguencia zero:\n");
-    			for(p = 0; p < q; p++) 
+  					for(p = 0; p < q; p++) 
     			{
     		    	for(v = 0; v < q; v++) 
     				{
-    					if (p == 0 && v == 0 || p == barra && v == barra)
+    					imp_zero[p][v] = 0;
+    				}
+    			}
+				  printf("\tTransformadores D-Y\n");
+  				printf("\nMatriz de impedancia de seguencia zero:\n");
+    			for(p = 0; p < q; p++)  //ANALIZAR MELHOR ESTA INTERAÇÃO!
+    			{
+    		    	for(v = 0; v < q; v++) 
+    				{
+    					if (p == 0 && v == 0 || p == barra-1 && v == barra-1)
 						{
     						imp_zero[p][v] = 3*res_ate + xlinhatraf[p-v];	
     					}
@@ -335,22 +356,26 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 						{
     						imp_zero[p][v] = xlinhatraf[p] + xlinha[p];
     					}
-						printf("\t%f", imp_zero[p][v]);
+						printf("\t%f ", imp_zero[p][v]);
+						fprintf(fp4, "\t%f", imp_zero[p][v]);
 					}
-					printf("\n");	
+					printf("\n");
+					fprintf(fp4, "\n");	
 				}
 			}
 			if (tipo_trafo[0] == 2 && tipo_trafo[barra] == 2)							//Transformadores Y-Y
     		{
-    			printf("\n\tTrafo do Gerador Y-Y\n\tTrafo da falta Y-Y\n");
+    			printf("\tTransformadores Y-Y\n");
     			printf("\nMatriz de impedancia de seguencia zero:\n");
 				for(p = 0; p < q; p++)
   				{
     				for (v = 0; v < q; v++)
   					{
 	  					printf("\t%f", imp_zero[p][v]);
+	  					fprintf(fp4, "\t%f", imp_zero[p][v]);
 					}
 					printf("\n");
+					fprintf(fp4, "\n");
 				}
 			}
 			if (tipo == 1)							//Falta monofásica
@@ -359,7 +384,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 				i_f = 3*(tensao[barra-1]/(2*(imp[barra-1][barra-1])+imp_zero[barra-1][barra-1]));
     			fprintf(fp1, "%f", i_f,0, i_f,0, i_f,0);
 				printf("\nDados de saida:");
-				printf("\n\tCorrente de falta: %f (para as 3 fases))", i_f);
+				printf("\n\tCorrente de falta: %f (para as 3 fases)", i_f);
 				printf("\n\tTensoes pos-falta:");
 				for(p = 0; p < q; p++)
   				{
@@ -377,11 +402,9 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
   				} 
 			}
 			
-			if (tipo == 2)							//Falta bifásica
+			if (tipo == 2)							//Falta bifásica sem terra
 			{
-				if (res_ate == 0)					//Falta bifásica sem terra
-				{
-				printf("\n\t Falta bifasica sem terra\n");
+				printf("\n\tFalta bifasica sem terra\n");
 				i_f = tensao[barra-1]/(2*imp[barra-1][barra-1]);
     			fprintf(fp1, "%f,%f,180,%f,0", 0, i_f*sqrt(3), -i_f*sqrt(3));
 				printf("\nDados de saida:");
@@ -401,22 +424,40 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 					printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], a_n_g[p]);
 					fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], a_n_g[p]);
   				}
-				} 
-				if (res_ate != 0) //Falta bifásica com terra
+			}
+				if (tipo == 4)					 //Falta bifásica com terra
 				{
-					printf("\n\t Falta bifasica com terra");	
-					i_f = tensao[barra-1]/(imp[barra-1][barra-1]+(imp[barra-1][barra-1]*imp_zero[barra-1][barra-1])/(imp[barra-1][barra-1]+imp_zero[barra-1][barra-1]));
-					i_f_n2 = (-i_f*imp_zero[barra-1][barra-1])/(imp[barra-1][barra-1]+imp_zero[barra-1][barra-1]);
-					i_f_zero2 = (-i_f*imp[barra-1][barra-1])/(imp[barra-1][barra-1]+imp_zero[barra-1][barra-1]);
+					printf("\n\tFalta bifasica com terra");	
+					i_f = tensao[barra-1]/(-imp[barra-1][barra-1]+(-imp[barra-1][barra-1]*imp_zero[barra-1][barra-1])/(-imp[barra-1][barra-1]+imp_zero[barra-1][barra-1]));
+					//printf("\n%f/(%f + (%f*%f/%f+%f))", tensao[barra-1], -imp[barra-1][barra-1], -imp[barra-1][barra-1], imp_zero[barra-1][barra-1], -imp[barra-1][barra-1], imp_zero[barra-1][barra-1]);
+					i_f_n2 = -i_f*imp_zero[barra-1][barra-1]/(imp[barra-1][barra-1]-imp_zero[barra-1][barra-1]);
+					i_f_zero2 = i_f*imp[barra-1][barra-1]/(imp[barra-1][barra-1]-imp_zero[barra-1][barra-1]);
+					//printf("\n1-%f		2-%f		0-%f\n", i_f, i_f_n2, i_f_zero2);
 					i_f_g_zero = i_f+i_f_n2+i_f_zero2;
-					i_f_g = sqrt ((i_f_zero2-(i_f+i_f_n2)/2)*(i_f_zero2-(i_f+i_f_n2)/2)+((-sqrt(3)/2)*(i_f-i_f_n2))*((-sqrt(3)/2)*(i_f-i_f_n2)));
-					a_f_g = (180/3.14)*atan((-sqrt(3)/2)*(i_f-i_f_n2)/(i_f_zero2-(i_f+i_f_n2)/2))+90;
+					i_f_g = sqrt ((i_f_zero2-(i_f-i_f_n2)/2)*(i_f_zero2-(i_f-i_f_n2)/2)+((-sqrt(3)/2)*(i_f+i_f_n2))*((-sqrt(3)/2)*(i_f+i_f_n2)));
+					//a_f_g = (180/3.14)*atan((-sqrt(3)/2)*(i_f-i_f_n2)/(i_f_zero2-(i_f+i_f_n2)/2))+90;
+					a_f_g = 90+(180/3.14)*atan((((i_f+i_f_n2)/2)/sqrt(3)/2)*(i_f-i_f_n2));
 					fprintf(fp1, "0,0,%f,%f,%f,%f", i_f_g,a_f_g,i_f_g,180-a_f_g);
 					printf("\n\tCorrente de falta: \n\t\tIfa 0L0\n\t\tIfb %fL%f\n\t\tIfc %fL%f", i_f_g,a_f_g,i_f_g,180-a_f_g);
+					printf("\n\tTensoes pos-falta:");
+					for(p = 0; p < q; p++)
+  					{
+						v_n_zero[p] = -i_f_zero2*imp_zero[p][barra-1];
+						v_n[p] = tensao[barra-1]+imp[p][barra-1]*i_f;
+						//printf("\n\t\t%f = %f - %f*%f", v_n[p], tensao[barra-1], imp[p][barra-1], i_f);
+						v_n_n[p] = -imp[p][barra-1]*i_f_n2 ;
+						//printf("\n\t\t%f  %f  %f", v_n_zero[p], v_n[p], v_n_n[p]);						
+						v_n_zero_g[p] = v_n_zero[p]+sqrt(((v_n[p]+v_n_n[p])*sqrt(3)/2)*((v_n[p]+v_n_n[p])*sqrt(3)/2)+(0.5*(v_n[p]-v_n_n[p]))*(0.5*(v_n[p]-v_n_n[p])));
+						a_n_zero[p] = 90-(180/3.14)*atan(sqrt(3)*(v_n[p]+v_n_n[p])/(v_n[p]-v_n_n[p]));
+						//printf("\n\t\t%f", a_n_zero[p]);
+						v_n_g[p] = sqrt ((v_n_zero[p]-(v_n[p]+v_n_n[p])/2)*(v_n_zero[p]-(v_n[p]+v_n_n[p])/2)+((-sqrt(3)/2)*(v_n[p]-v_n_n[p]))*((-sqrt(3)/2)*(v_n[p]-v_n_n[p])));
+						//printf("\n\t\t%f", v_n_g[p]);
+						a_n_g[p] = 60+(180/3.14)*atan((v_n_zero[p]-(v_n[p]+v_n_n[p])/2)/((-sqrt(3)/2)*(v_n[p]-v_n_n[p])));
+						//printf("\n\t\t%f", a_n_g[p]);
+						printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], a_n_g[p]+60);
+						fprintf(fp2, "%d,%f %f, %f %f, %f %f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], a_n_g[p]+60);
+  					}		
 				}					
-			}
-			
-
 		}	
 	}
 	
@@ -456,7 +497,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
   	
   	printf("\n\tCorrente de falta nas linhas:");
   	
-	if (tipo == 1 || tipo == 2)
+	if (tipo != 3)
 	{
 		xlinha[q] = xlinha[q-2];
 	for(p = 0; p < q; p++)
@@ -505,6 +546,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 	fclose(fp1);
 	fclose(fp2);
 	fclose(fp3);
+	fclose(fp4);
 }
 
 

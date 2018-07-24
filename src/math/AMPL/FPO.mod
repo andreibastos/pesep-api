@@ -2,12 +2,7 @@
 set BUS;    # Barras
 set BRANCH within {1..4000} cross BUS cross BUS; # Linhas (Guarda os índices e barra de partida e chegada)
 
-<<<<<<< HEAD:src/math/FPO/FPO.mod
-# Arquivo de solução
-option solver '../../../../ampl/minos';				#Escolhe o MINOS como solver
-=======
 # dados das barras
->>>>>>> master:src/math/FPO.mod
 
 # Dados das barras
 param bus_type       {BUS};       # Tipo (3-Slack 2-PV 0-PQ)
@@ -23,7 +18,7 @@ param bus_q_load     {BUS};       # Potência reativa da carga
 param bus_p_gen_min  {BUS};       # Potência ativa mínima no gerador
 param bus_p_gen_max  {BUS};       # Potência ativa máxima no gerador
 param bus_q_shunt    {BUS};       # Potência reativa do shunt em cada barra
-param bus_x        {BUS};         # Reatância da barra
+param bus_x        {BUS};       # Reatância da barra
 
 # dados das linhas
 
@@ -38,7 +33,6 @@ param branch_traf  {BRANCH};      # Tipo de transformador: 1-DY e 2-YY
 param branch_g       {(l,k,m) in BRANCH} := branch_r[l,k,m]/(branch_r[l,k,m]^2+branch_x[l,k,m]^2); # Condutância
 param branch_b       {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m])^2); # Susceptância
 param branch_b_zero  {(l,k,m) in BRANCH} :=-(branch_x[l,k,m]+branch_x_traf[l,k,m]+branch_res_zero[l,k,m])/(branch_r[l,k,m]^2+(branch_x[l,k,m]+branch_x_traf[l,k,m]+branch_res_zero[l,k,m])^2); # Susceptância de sequência zero
-
 
 # dados gerais
 
@@ -74,13 +68,7 @@ else if(k != m) then (sum{(l,k,m) in BRANCH} (-branch_g[l,k,m]*cos(branch_def[l,
  
 param B{(k,m) in YBUS} =    # Monta o vetor de susceptância para o fluxo de potência
 if(k == m) then (sum{(l,k,i) in BRANCH} (branch_b[l,k,i]*branch_tap[l,k,i]^2)
-                                + sum{(l,i,k) in BRANCH} (branch_b[l,i,k])) 
-else if(k != m) then (sum{(l,k,m) in BRANCH} (branch_g[l,k,m]*sin(branch_def[l,k,m])-branch_b[l,k,m]*cos(branch_def[l,k,m]))*branch_tap[l,k,m]
-                     +sum{(l,m,k) in BRANCH} (-branch_g[l,m,k]*sin(branch_def[l,m,k])-branch_b[l,m,k]*cos(branch_def[l,m,k]))*branch_tap[l,m,k]);
-
-param B_aux{(k,m) in YBUS} =    # Monta o vetor de susceptância auxiliar para o fluxo de potência
-if(k == m) then (sum{(l,k,i) in BRANCH} (branch_b[l,k,i]*branch_tap[l,k,i]^2)
-                                + sum{(l,i,k) in BRANCH} (branch_b[l,i,k])-bus_x[k]) 
+                                + sum{(l,i,k) in BRANCH} (branch_b[l,i,k]))
 else if(k != m) then (sum{(l,k,m) in BRANCH} (branch_g[l,k,m]*sin(branch_def[l,k,m])-branch_b[l,k,m]*cos(branch_def[l,k,m]))*branch_tap[l,k,m]
                      +sum{(l,m,k) in BRANCH} (-branch_g[l,m,k]*sin(branch_def[l,m,k])-branch_b[l,m,k]*cos(branch_def[l,m,k]))*branch_tap[l,m,k]);
 
@@ -233,7 +221,7 @@ for{(l,k,m) in BRANCH} {
 
 # Gera o arquivo da matriz de susceptâncias para o Curto Circuito
   for {(k,m) in YBUS }{
-    printf "%f ", B_aux[k,m] > sus.txt;
+    printf "%f ", B[k,m] > sus.txt;
   }
 
 # Gera o arquivo da matriz de susceptâncias para o Curto Circuito
