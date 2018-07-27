@@ -46,8 +46,8 @@ def calcule(math_method, inputs):
 
         # remove_inputs(results, input_files)
 
-        # remove_temps(directory)
-        # print('removing {0}'.format(directory))
+        remove_temps(directory)
+        print('removing {0}'.format(directory))
     except Exception as error:
         print error
 
