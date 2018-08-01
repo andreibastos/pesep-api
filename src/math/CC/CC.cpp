@@ -306,7 +306,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     	{	
     		printf("\n\tTrifasica\n");
     		i_f = tensao[barra-1]/((imp[barra-1][barra-1])+res_ate); //Obten��o da corrente de falta trif�sica
-    		fprintf(fp1, "%f,90,%f,90,%f,90", i_f,i_f,i_f);
+    		fprintf(fp1, "%f,%f,%f", i_f,i_f,i_f);
     		printf("\nDados de saida:");
 			printf("\n\tCorrente de falta: %f", i_f);
 			printf("\n\tTensoes pos-falta:");
