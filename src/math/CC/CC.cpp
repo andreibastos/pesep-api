@@ -306,7 +306,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     	{	
     		printf("\n\tTrifasica\n");
     		i_f = tensao[barra-1]/((imp[barra-1][barra-1])+res_ate); //Obten��o da corrente de falta trif�sica
-    		fprintf(fp1, "%f,%f,%f", i_f,i_f,i_f);
+    		fprintf(fp1, "%f,90,%f,90,%f,90", i_f,i_f,i_f);
     		printf("\nDados de saida:");
 			printf("\n\tCorrente de falta: %f", i_f);
 			printf("\n\tTensoes pos-falta:");
@@ -390,7 +390,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 			{
 				printf("\n\t Falta monofasica\n");
 				i_f = 3*(tensao[barra-1]/(2*(imp[barra-1][barra-1])+imp_zero[barra-1][barra-1])); //Obten��o da corrente de falta monof�sica
-    			fprintf(fp1, "%f,%f,%f", i_f, i_f, i_f);
+    			fprintf(fp1, "%f,90,%f,90,%f,90", i_f, i_f, i_f);
 				printf("\nDados de saida:");
 				printf("\n\tCorrente de falta: %f (para as 3 fases)", i_f);
 				printf("\n\tTensoes pos-falta:");
@@ -414,7 +414,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 			{
 				printf("\n\tFalta bifasica sem terra\n");
 				i_f = tensao[barra-1]/(2*imp[barra-1][barra-1]); //Obten��o da corrente de falta
-    			fprintf(fp1, "%f,%f,180,%f,0", 0, i_f*sqrt(3), -i_f*sqrt(3));
+    			fprintf(fp1, "0,0,%f,180,%f,0", i_f*sqrt(3), -i_f*sqrt(3));
 				printf("\nDados de saida:");
 				printf("\n\tCorrente de falta: \n\t\tIfa %fL0\n\t\tIfb %fL180\n\t\tIfc %fL0", 0, i_f*sqrt(3), -i_f*sqrt(3));
 				printf("\n\tTensoes pos-falta:");
