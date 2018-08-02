@@ -527,7 +527,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 		i_l_g[p] = sqrt((i_l_zero[p]-(i_l[p]+i_l_n[p])/2)*(i_l_zero[p]-(i_l[p]+i_l_n[p])/2)+((-sqrt(3)/2)*(i_l[p]-i_l_n[p]))*((-sqrt(3)/2)*(i_l[p]-i_l_n[p]))); //Obten��o da corrente p�s falta nas linhas de segu�ncia postiva
 		if (p != 0){ 
 		printf("\n\t\tLinhas %d-%d\n\t\t\tIa:%f\n \t\t\tIb:%f\n \t\t\tIc:%f\n", p, p+1, i_l_zero_g[p], i_l_g[p], i_l_g[p]);
-		fprintf(fp3, "%d-%d,%f,%f, %f,%f, %f,%f\n", p, p+1, i_l_zero_g[p], i_l_g[p], i_l_g[p]);
+		fprintf(fp3, "%d,%d,%f,%f, %f,%f, %f,%f\n", p, p+1, i_l_zero_g[p], i_l_g[p], i_l_g[p]);
 	}
   	}
   	}
