@@ -390,7 +390,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 			{
 				printf("\n\t Falta monofasica\n");
 				i_f = 3*(tensao[barra-1]/(2*(imp[barra-1][barra-1])+imp_zero[barra-1][barra-1])); //Obten��o da corrente de falta monof�sica
-    			fprintf(fp1, "%f", i_f,90, i_f,90, i_f,90);
+    			fprintf(fp1, "%f,90,%f,90,%f,90", i_f, i_f, i_f);
 				printf("\nDados de saida:");
 				printf("\n\tCorrente de falta: %f (para as 3 fases)", i_f);
 				printf("\n\tTensoes pos-falta:");
