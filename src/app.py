@@ -15,7 +15,7 @@ import json
 import re
 import os
 
-from models.power_flow import PowerFlow
+from controllers.SystemEletricPower import calcule, compile_CC
 
 ######################### Configurações ##################################
 app = Flask(__name__)
@@ -28,13 +28,25 @@ app.config['SECRET_KEY'] = 'super-secret'
 route_default = "/"
 route_default_calcules = route_default + "calcule"
 route_default_config = route_default + "config"
-cors = CORS(app, resources={route_default_calcules+"/*": {"origins": "*"}})
+cors = CORS(app, resources={"/*": {"origins": "*"}})
 
 
 ####################### Funções comuns #######################################
 def datetime_to_timestamp(dt):
     timestamp = (dt - datetime.datetime(1970, 1, 1)).total_seconds()
     return int(timestamp)
+
+
+def get_response_data(request):
+    try:
+        if request.method == 'POST':
+            if request.headers['Content-Type'] == 'application/json':
+                try:
+                    return request.json
+                except Exception as identifier:
+                    raise InvalidUsage(identifier.message)
+    except Exception as identifier:
+        raise InvalidUsage(identifier.message)
 
 ####################### Classes #############################################
 
@@ -48,7 +60,7 @@ class InvalidUsage(Exception):
         if status_code is not None:
             self.status_code = status_code
         self.payload = payload
-        print(message_error)
+        print(self.to_dict())
 
     def to_dict(self):
         rv = dict(self.payload or ())
@@ -60,78 +72,70 @@ class InvalidUsage(Exception):
 ######################## Erros ###############################################
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return Response(json.dumps({'message_error': 'not exist.  please usage: /calcule/power_flower or /calcule/short_circuit ', 'code': 404, 'error': True}), status=404,
+                    mimetype='application/json')
+
+
 @app.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-    return response
+    return Response(json.dumps(error.to_dict()), status=200,
+                    mimetype='application/json')
 
 ######################## Rotas ###############################################
-########### cálculos #######################################################
 # Fluxo de Potência
 
 
 @app.route(route_default_calcules+"/power_flow", methods=['POST', 'GET'])
 def power_flow():
-    try:
-        if request.method == 'POST':
-            if request.headers['Content-Type'] == 'application/json':
-                try:
-                    bus = request.json["barras"]
-                    line = request.json["linhas"]
-                    print(bus)
-                    print(line)
-                    flow = calcule_power_flow(line, bus)
-                    # resp = Response(json.dumps(flow), status=200,
-                    #                 mimetype='application/json')
-                    resp = Response(json.dumps([]), status=200, mimetype='application/json')
-                    return resp
+    data = get_response_data(request)
+    if (data):
+        inputs = []
+        print(data)
+        files = ['barra.csv', 'linha.csv']
+        for filename in files:
+            inputs.append({
+                'filename': filename,
+                'data': data[filename]
+            })
+        flow = calcule('power_flow', inputs)
 
-                except Exception as identifier:
-                    
-                    raise InvalidUsage(identifier.message)
+        resp = Response(json.dumps(flow), status=200,
+                        mimetype='application/json')
+        return resp
+    else:
+        raise InvalidUsage('not find files')
 
-    except Exception as identifier:
-        print(identifier)
-        raise InvalidUsage(identifier.message)
 
 # Curto Circuito
 
 
-@app.route(route_default_calcules+"/short", methods=['POST', 'GET'])
+@app.route(route_default_calcules+"/short_circuit", methods=['POST', 'GET'])
 def short_circuit():
-    try:
-        if request.method == 'POST':
-            if request.headers['Content-Type'] == 'application/json':
-                try:
-                    resp = Response(json.dumps(request.json), status=200,
-                                    mimetype='application/json')
-                    return resp
+    data = get_response_data(request)
+    if (data):
+        try:
+            inputs = []
+            files = ['barra.csv', 'linha.csv', 'entrada_falta.txt']
+            for filename in files:
+                inputs.append({
+                    'filename': filename,
+                    'data': data[filename]
+                })
+            short = calcule('short_circuit', inputs)
 
-                except Exception as identifier:
-                    raise InvalidUsage(identifier.message)
-
-    except Exception as identifier:
-        raise InvalidUsage(identifier.message)
-
-def verify_consistency(lines, buses):
-    return True
-
-
-def calcule_power_flow(lines, buses):
-    try:
-        results = []
-        consistency = verify_consistency(lines, buses)
-        if consistency:
-            power_flow = PowerFlow(lines, buses)
-            power_flow.calcule()
-            results = power_flow.results
-        return results
-    except:
-        raise
-
+            resp = Response(json.dumps(short), status=200,
+                            mimetype='application/json')
+            return resp
+        except Exception as error:
+            raise InvalidUsage(error.message)
+    else:
+        raise InvalidUsage('not find files')
 
 # Configurações
+
+
 @app.route(route_default_config + "/headers")
 def get_headers():
     f = open('./config/headers_files.json', 'r')
@@ -144,4 +148,5 @@ def get_headers():
 
 ######################## Função Principal ######################################
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=os.environ.get('port', 5000))
+    compile_CC()
+    app.run(host="0.0.0.0", port=os.environ.get('port', 5000), ssl_context=('cert.pem', 'key.pem'))

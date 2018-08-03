@@ -2,7 +2,8 @@
 set BUS;    # Barras
 set BRANCH within {1..4000} cross BUS cross BUS; # Linhas (Guarda os índices e barra de partida e chegada)
 
-# dados das barras
+# Arquivo de solução
+option solver '../../../../ampl/minos';				#Escolhe o MINOS como solver
 
 # Dados das barras
 param bus_type       {BUS};       # Tipo (3-Slack 2-PV 0-PQ)
