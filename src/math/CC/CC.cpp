@@ -15,6 +15,8 @@ void cofactor(float [][100], float, int[], int[], int); //Declara a funï¿½ï¿½o q
 void transpose(float [][100], float [][100], float, int[], int[], int); //Declara a funï¿½ï¿½o que irï¿½ calcular a matriz transposta, suas entradas e retorno
 void fault (float [100][100], float [100][100], int, int[], int[], int); //Declara a funï¿½ï¿½o que irï¿½ calcular os dados de falta, suas entradas e retorno
 FILE *fp4; //Declara o ponteiro para o arquivo que guarda os elementos das matrizes de seguï¿½ncia
+FILE *fp5; //Declara o ponteiro para o arquivo que guarda os elementos das matriz de susceptância
+FILE *fp6; //Declara o ponteiro para o arquivo que guarda os elementos das matriz de susceptância
 
 int main() //
 {
@@ -23,7 +25,9 @@ int main() //
   FILE *file1_zero = fopen("sus_zero.txt", "r"); //Abre o arquivo com os elementos da matriz de susceptï¿½ncia de seguï¿½ncia zero, diferentes de zero, vindo do FP
   FILE *file2 = fopen("coluna.txt", "r"); //Abre o arquivo com o ï¿½ndice das colunas que cujos parï¿½metros sï¿½o diferentes de zero, vindo do FP
   FILE *file3 = fopen("linha.txt", "r"); //Abre o arquivo com o ï¿½ndice das linhas que cujos parï¿½metros sï¿½o diferentes de zero, vindo do FP
-  fp4 = fopen("matriz_imp.txt","w"); //Abre o arquivo da matriz de impedï¿½ncia para preenchimento
+  fp4 = fopen("matriz_imp.txt","w"); //Abre o arquivo da matriz de impedï¿½ncia positiva/negativa para preenchimento
+  fp5 = fopen("matriz_sus.txt","w"); //Abre o arquivo da matriz de susceptância para preenchimento
+  fp6 = fopen("matriz_imp_zero.txt","w"); //Abre o arquivo da matriz de impedï¿½ncia zero para preenchimento
 
   float inverse[100][100]; //Declara o tamanho mï¿½ximo da matriz inversa 
  
@@ -83,14 +87,17 @@ int main() //
     a_zero[linha-1][coluna-1] = sus_zero; //Preenche o elemento da matriz de susceptï¿½ncia zero
   }
   
-//    for (w=0; w < k; w++)
-//  {
-//    for (c=0; c < k; c++)
-//  	{
-//		printf("\t%f", a[w][c]);
-//  	}
-//  	printf("\n");
-//  }
+  //Salva a matriz de susceptância no arquivo matriz_sus.txt
+    for (w=0; w < k; w++)
+  {
+    for (c=0; c < k; c++)
+  	{
+		//printf("\t%f", a[w][c]);
+		fprintf(fp5, "\t%f", a[w][c]); 
+  	}
+  	//printf("\n");
+  	fprintf(fp5, "\n"); 
+  }
 
   d = determinant(a, k); //Chama a funï¿½ï¿½o Determinante, com o tamanho da matriz e amtriz de susceptï¿½ncia
   if (d == 0) //Condiï¿½ï¿½o onde o determinante ï¿½ zero e em conseguï¿½ncia nï¿½o hï¿½ matriz inversa
@@ -365,10 +372,10 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     						imp_zero[p][v] = xlinhatraf[p] + xlinha[p];
     					}
 						printf("\t%f ", imp_zero[p][v]);
-						fprintf(fp4, "\t%f", imp_zero[p][v]);
+						fprintf(fp6, "\t%f", imp_zero[p][v]);
 					}
 					printf("\n");
-					fprintf(fp4, "\n");	
+					fprintf(fp6, "\n");	
 				}
 			}
 			if (tipo_trafo[0] == 2 && tipo_trafo[barra] == 2)							//Transformadores Y-Y
@@ -380,10 +387,10 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     				for (v = 0; v < q; v++) 
   					{
 	  					printf("\t%f", imp_zero[p][v]);
-	  					fprintf(fp4, "\t%f", imp_zero[p][v]);
+	  					fprintf(fp6, "\t%f", imp_zero[p][v]);
 					}
 					printf("\n");
-					fprintf(fp4, "\n");
+					fprintf(fp6, "\n");
 				}
 			}
 			if (tipo == 1)							//Condiï¿½ï¿½o de falta monofï¿½sica
@@ -555,6 +562,8 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 	fclose(fp2);
 	fclose(fp3);
 	fclose(fp4);
+	fclose(fp5);
+	fclose(fp6);
 }
 
 
