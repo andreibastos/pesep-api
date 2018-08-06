@@ -275,14 +275,15 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 	//printf("%f ", dados_falta[v]);
   	}
 	//Aloca��o dos dados da falta lidos em var�aveis
-  	local = dados_falta[0]; 
-  	barra = dados_falta[1]; 
-  	linha1 = dados_falta[2]; 
-  	linha2 = dados_falta[3]; 
-  	porc_linha = dados_falta[4]; 
-  	tipo = dados_falta[5]; 
-  	res_ate = dados_falta[6]; 
-  	res_zero = dados_falta[7]; 
+  	//local = dados_falta[0]; 
+  	barra = dados_falta[0]; 
+  	//linha1 = dados_falta[2]; 
+  	//linha2 = dados_falta[3]; 
+  	porc_linha = dados_falta[1]; 
+  	tipo = dados_falta[2]; 
+  	res_ate = dados_falta[3]; 
+  	res_zero = dados_falta[4]; 
+  	//printf("\n%d,%d,%d,%f,%f",barra,porc_linha,tipo,res_ate,res_zero);  	
   	//Abre os arquivos de sa�da para preenchimento
   	fp1 = fopen("corrente_falta.txt","w"); 
   	fp2 = fopen("tensao_pos_falta.txt","w"); 
@@ -305,10 +306,6 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     	break; 
     	printf("\t%d: %fL%f\n", p+1, tensao[p], angulo[p]); 
   	}
-  	printf("\nDados da falta:"); 
-	if (local == 1) 							//Condi��o de falta na barra
-    {	
-    	printf("\n\tFalta na barra %d\n", barra);
     	if (tipo == 3)							//Condi��o de falta trif�sica
     	{	
     		printf("\n\tTrifasica\n");
@@ -345,7 +342,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     					imp_zero[p][v] = 0; 
     				}
     			}
-				printf("\tTransformadores D-Y\n");
+				printf("\n\tTransformadores D-Y\n");
   				printf("\nMatriz de impedancia de seguencia zero:\n");
     			for(p = 0; p < q; p++)  //Obtem a matriz de segu�ncia zero para um sistema formado por transformadores D-Y
     			{
@@ -380,7 +377,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 			}
 			if (tipo_trafo[0] == 2 && tipo_trafo[barra] == 2)							//Transformadores Y-Y
     		{
-    			printf("\tTransformadores Y-Y\n");
+    			printf("\n\tTransformadores Y-Y\n");
     			printf("\nMatriz de impedancia de seguencia zero:\n");
 				for(p = 0; p < q; p++) //Obtem a matriz de segu�ncia zero para um sistema formado por transformadores Y-Y
   				{
@@ -413,7 +410,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 					a_n_g[p] = (180/3.14)*atan((-v_n_zero[p]+v_n[p]+v_n_n[p])/-(v_n_zero[p]+v_n[p]))+180; //Obten��o do �ngulo da tens�o p�s falta monof�sica de segu�ncia positivo
 					v_n_g[p] = sqrt ((v_n_zero[p]-(v_n[p]+v_n_n[p])/2)*(v_n_zero[p]-(v_n[p]+v_n_n[p])/2)+((-sqrt(3)/2)*(v_n[p]-v_n_n[p]))*((-sqrt(3)/2)*(v_n[p]-v_n_n[p]))); //Obten��o da tens�o p�s falta monof�sica de segu�ncia positivo
 					printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], -a_n_g[p]); 
-					fprintf(fp2, "%d,%f,%f, %f,%f, %f,%f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], -a_n_g[p]); //
+					fprintf(fp2, "%d,%f,%f, %f,%f, %f,%f\n", p+1, v_n_zero_g[p], a_n_zero[p], v_n_g[p], a_n_g[p], v_n_g[p], -a_n_g[p]); 
   				} 
 			}
 			
@@ -474,34 +471,33 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
   					}		
 				}					
 		}	
-	}
 	
-	if (local == 0) 									//Falta na linha
-    {	
-    	if (porc_linha == 1)
-		{
-			printf("\n\tFalta na linha %d-%d", linha1, linha2);
-		}
-		else {
-			printf("\n\tFalta a %d por cento da linha %d-%d", porc_linha, linha1, linha2);
-			
-		}
-		if (tipo == 3)							//Falta trif�sica
-    	{	
-    		printf("\n\tTrifasica\n");
-    		i_f = (tensao[linha2])/((imp[linha1][linha2])+res_ate); //Obten��o da corrente de falta trif�sica na linha
-    		fprintf(fp1, "%f,90,%f,90,%f,90", i_f,i_f,i_f);
-    		printf("\nDados de saida:");
-			printf("\n\tCorrente de falta: %f A", i_f);
-			printf("\n\tTensoes pos-falta:");
-			for(p = 0; p < q; p++) //
-  			{
-				v_n[p] = (tensao[linha2-1])*(1-imp[p][linha1-1]/((imp[linha1-1][linha2-1])+res_ate)); //Obten��o da tens�o p�s falta nas barras por falta trif�sica na linha
-				fprintf(fp2, "%d,%f,%f, %f,%f, %f,%f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120); 
-				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120); 	
-  			} 	
-		}
-	}
+//	if (local == 0) 									//Falta na linha
+//    {	
+//    	if (porc_linha == 1)
+//		{
+//			printf("\n\tFalta na linha %d-%d", linha1, linha2);
+//		}
+//		else {
+//			printf("\n\tFalta a %d por cento da linha %d-%d", porc_linha, linha1, linha2);
+//			
+//		}
+//		if (tipo == 3)							//Falta trif�sica
+//    	{	
+//    		printf("\n\tTrifasica\n");
+//    		i_f = (tensao[linha2])/((imp[linha1][linha2])+res_ate); //Obten��o da corrente de falta trif�sica na linha
+//    		fprintf(fp1, "%f,90,%f,90,%f,90", i_f,i_f,i_f);
+//    		printf("\nDados de saida:");
+//			printf("\n\tCorrente de falta: %f A", i_f);
+//			printf("\n\tTensoes pos-falta:");
+//			for(p = 0; p < q; p++) //
+//  			{
+//				v_n[p] = (tensao[linha2-1])*(1-imp[p][linha1-1]/((imp[linha1-1][linha2-1])+res_ate)); //Obten��o da tens�o p�s falta nas barras por falta trif�sica na linha
+//				fprintf(fp2, "%d,%f,%f, %f,%f, %f,%f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120); 
+//				printf("\n\t\tBarra %d\n\t\t\tVa:%fL%f\n \t\t\tVb:%fL%f\n \t\t\tVc:%fL%f\n", p+1, v_n[p], angulo[p],v_n[p], angulo[p]-120,v_n[p], angulo[p]+120); 	
+//  			} 	
+//		}
+//	}
 		
 	for(v = 0; v < (ta-q); v++)
   	{
