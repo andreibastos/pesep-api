@@ -116,3 +116,7 @@ src/math/*.exe
 src/math/Core
 
 ampl/
+
+src/cert\.pem
+
+src/key\.pem
