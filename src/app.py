@@ -149,4 +149,5 @@ def get_headers():
 ######################## Função Principal ######################################
 if __name__ == '__main__':
     compile_CC()
-    app.run(host="0.0.0.0", port=os.environ.get('port', 5000), ssl_context=('cert.pem', 'key.pem'))
+    context = ('kvaflow.crt', 'kvaflow.key')
+    app.run(host="0.0.0.0",threaded=True, port=os.environ.get('port', 5000), ssl_context=context)
