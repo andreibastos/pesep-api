@@ -228,8 +228,7 @@ void transpose(float num[100][100], float fac[100][100], float r, int lin[], int
         }
                 printf("\n");
                 fprintf(fp4, "\n");
-    }
-	fprintf(fp4, "\n\n");	 
+    } 
 	}
 	
 	    if (flag == 0){ //Condi��o da matriz ser de segu�ncia positiva/negativa
