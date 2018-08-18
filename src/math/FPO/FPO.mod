@@ -93,7 +93,7 @@ minimize dummy_minimization : dummy;
 # restrições
 
 subject to p_load {k in BUS : bus_type[k] == 0}:
-   bus_p_gen[k] + bus_q_shunt[k] - bus_p_load[k] - sum{(k,m) in YBUS} (bus_voltage[k]*bus_voltage[m]*
+   bus_p_gen[k] - bus_p_load[k] - sum{(k,m) in YBUS} (bus_voltage[k]*bus_voltage[m]*
                           (G[k,m]*cos(bus_angle[k]-bus_angle[m])+B[k,m]*sin(bus_angle[k]-bus_angle[m]))) = 0;
 
    subject to q_load {k in BUS : bus_type[k] == 0}: 
