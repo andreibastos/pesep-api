@@ -347,7 +347,7 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
     			{
     		    	for(v = 0; v < q; v++) 
     				{
-    					if (p == 0 && v == 0 || p == barra-1 && v == barra-1)
+    					if (p == 0 && v == 0 || p == barra && v == barra)
 						{
     						imp_zero[p][v] = 3*res_ate + xlinhatraf[p-v];	
     					}
