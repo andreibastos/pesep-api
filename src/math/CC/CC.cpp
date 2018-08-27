@@ -445,9 +445,9 @@ void fault(float imp[100][100], float imp_zero[100][100], int q, int lin[], int 
 					i_f_zero2 = i_f*imp[barra-1][barra-1]/(imp[barra-1][barra-1]-imp_zero[barra-1][barra-1]); 
 					//printf("\n1-%f		2-%f		0-%f\n", i_f, i_f_n2, i_f_zero2);
 					i_f_g_zero = i_f+i_f_n2+i_f_zero2; //Obten��o da corrente de falta de segu�ncia zero
-					i_f_g = sqrt ((i_f_zero2-(i_f-i_f_n2)/2)*(i_f_zero2-(i_f-i_f_n2)/2)+((-sqrt(3)/2)*(i_f+i_f_n2))*((-sqrt(3)/2)*(i_f+i_f_n2))); //Obten��o da corrente de falta de segu�ncia positiva
+					i_f_g = sqrt((i_f_zero2+0.5*(i_f-i_f_n2))*(i_f_zero2+0.5*(i_f-i_f_n2))+(sqrt(3)*(-i_f-i_f_n2)/2)*(sqrt(3)*(-i_f-i_f_n2)/2)); //Obten��o da corrente de falta de segu�ncia positiva
 					//a_f_g = (180/3.14)*atan((-sqrt(3)/2)*(i_f-i_f_n2)/(i_f_zero2-(i_f+i_f_n2)/2))+90;
-					a_f_g = 90+(180/3.14)*atan((((i_f+i_f_n2)/2)/sqrt(3)/2)*(i_f-i_f_n2)); //Obten��o do �ngulo da corrente de falta de segu�ncia positiva
+					a_f_g = 90+(180/3.14)*atan((sqrt(3)*(-i_f-i_f_n2)/2)/(i_f_zero2+0.5*(i_f-i_f_n2))); //Obten��o do �ngulo da corrente de falta de segu�ncia positiva
 					fprintf(fp1, "0,0,%f,%f,%f,%f", i_f_g,a_f_g,i_f_g,180-a_f_g); 
 					printf("\n\tCorrente de falta: \n\t\tIfa 0L0\n\t\tIfb %fL%f\n\t\tIfc %fL%f", i_f_g,a_f_g,i_f_g,180-a_f_g);
 					printf("\n\tTensoes pos-falta:");
