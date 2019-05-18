@@ -43,7 +43,7 @@ def calcule(math_method, inputs):
 
 
 def create_directory(math_method):
-    dir_tmp = "tmp/"
+    dir_tmp = SRC_DIR + "/tmp/"
     try:
         os.mkdir(dir_tmp)
     except Exception as e:
