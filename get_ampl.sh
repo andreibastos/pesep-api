@@ -1,9 +1,8 @@
 #!/bin/bash
-
-mkdir -p downloads
+# cria a pasta para o ampl
 mkdir -p ampl
 
-# baixa o amplx64
+# baixa o amplx64 para linux
 wget https://ampl.com/demo/ampl.linux64.tgz -O ampl/ampl.linux64.tgz
 
 # # baixa o minos
@@ -19,7 +18,7 @@ mv ampl/ampl.linux64/* ampl/
 # gzip -c ampl/minos.gz > ampl/minos
 # gzip -c ampl/lpsolve.gz > ampl/lpsolve
 
-# remove tmps
+# remove os arquivos baixados tmps
 rm ampl/ampl.linux64/ -r 
 rm ampl/ampl.linux64.tgz
-rm ampl/*.*gz
+# rm ampl/*.*gz

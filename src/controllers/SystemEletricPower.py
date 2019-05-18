@@ -21,7 +21,6 @@ COMMAND_SHORT_CIRCUIT = "./CC.sh"
 def calcule(math_method, inputs):
     command = ""
     results = {}
-    
     if (math_method == 'power_flow'):
         command = COMMAND_POWER_FLOW
     else:
@@ -29,38 +28,27 @@ def calcule(math_method, inputs):
             command = COMMAND_SHORT_CIRCUIT
 
     try:
-
         directory = create_directory(math_method)
-        print ('creating {0}'.format(directory))
-        
         save_files(inputs, directory)
-
         input_files = os.listdir(directory)
-        print ('saving inputs {0}'.format(", ".join(input_files)))
-
         execute_command(command, directory)
-        print ('executing {0}'.format(command))
-
         results = load_files(directory)
-        print ('results: {0} files'.format(len(results)))
-
-        # remove_inputs(results, input_files)
-
-        # remove_temps(directory)
-        print('removing {0}'.format(directory))
+        remove_inputs(results, input_files)
+        remove_temps(directory)
     except Exception as error:
-        print error
+        pass
 
     return results
 
 
 def create_directory(math_method):
+    dir_tmp = "tmp/"
     try:
-        os.mkdir("tmp")
+        os.mkdir(dir_tmp)
     except Exception as e:
         pass
 
-    directory_temp = "tmp/"+math_method
+    directory_temp = dir_tmp + math_method
     try:
         os.mkdir(directory_temp)
     except Exception as e:
@@ -105,13 +93,12 @@ def save_file(name, lines):
                 index += 1
 
     except Exception as error:
-        print error
+        pass
 
 
 def execute_command(command, directory):
     process = subprocess.Popen([command, directory])
     output, error = process.communicate()
-    # print output, error
 
 
 def remove_temps(directory):
@@ -119,7 +106,7 @@ def remove_temps(directory):
         if (os.path.exists(directory)):
             shutil.rmtree(directory, ignore_errors=True)
     except Exception as error:
-        print error
+        pass
 
 
 def load_files(directory):
@@ -144,7 +131,7 @@ def load_file(filename):
                 count_space = len(first_line.strip().split(" "))
                 if (count_space > count_comma):
                     delimiter = ' '
-                file_loaded = [x.strip().split(delimiter) for x in lines ]
+                file_loaded = [x.strip().split(delimiter) for x in lines]
                 for line in file_loaded:
                     for column in line:
                         column = column.decode("utf-8").encode("utf-8")
@@ -164,11 +151,11 @@ def remove_inputs(results, input_files):
     for key in keys_remove:
         results.pop(key, None)
 
+
 def compile_CC():
     try:
         os.mkdir("../dist")
     except:
         pass
-
     process = subprocess.Popen(COMMAND_COMPILE, shell=True)
     output, error = process.communicate()
