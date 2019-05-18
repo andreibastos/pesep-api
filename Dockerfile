@@ -7,7 +7,7 @@ WORKDIR /root/app
 COPY . /root/app
 
 # Instala as dependencias
-RUN apt-get update && apt-get install -y python-pip g++ 
+RUN apt-get update && apt-get install -y python-pip g++ wget
 RUN pip install -r requirements.txt --no-cache-dir
 
 # # inicializa o repositóro (baixa ampl, compila o cc) 
