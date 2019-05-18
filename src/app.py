@@ -60,7 +60,6 @@ class InvalidUsage(Exception):
         if status_code is not None:
             self.status_code = status_code
         self.payload = payload
-        print(self.to_dict())
 
     def to_dict(self):
         rv = dict(self.payload or ())
@@ -92,7 +91,6 @@ def power_flow():
     data = get_response_data(request)
     if (data):
         inputs = []
-        print(data)
         files = ['barra.csv', 'linha.csv']
         for filename in files:
             inputs.append({
