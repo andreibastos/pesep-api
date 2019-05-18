@@ -16,12 +16,12 @@ import json
 import re
 import os
 
-from controllers.SystemEletricPower import calcule, compile_CC
+from controllers.SystemEletricPower import calcule
+from settings import HEADER_FILES, SECRET_KEY
+
 # Configurações
 app = Flask(__name__)
-app.debug = True
-app.threaded = True
-app.config['SECRET_KEY'] = 'super-secret'
+app.secret_key = SECRET_KEY
 
 # Caminhos das rotas
 route_default = '/'
@@ -131,7 +131,7 @@ def short_circuit():
 # Configurações
 @app.route(route_default_config + '/headers')
 def get_headers():
-    f = open('./config/headers_files.json', 'r')
+    f = open(HEADER_FILES, 'r')
     HEADERS = json.load(f)
     response = Response(json.dumps(HEADERS),
                         status=200,
@@ -142,8 +142,4 @@ def get_headers():
 
 # Main
 if __name__ == '__main__':
-    compile_CC()
-    # context = ('kvaflow.crt', 'kvaflow.key')
-    # app.run(host='0.0.0.0',threaded=True, port=os.environ.get('port', 5000),
-    # ssl_context = context)
-    app.run(host='0.0.0.0', threaded=True, port=os.environ.get('port', 5000))
+    app.run()
