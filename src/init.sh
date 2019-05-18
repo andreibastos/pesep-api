@@ -9,4 +9,4 @@ fi
 sh get_ampl.sh
 
 # compila o CC
-sh compile_CC.sh
+sh compile_cc.sh
