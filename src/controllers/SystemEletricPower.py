@@ -11,11 +11,12 @@ import shutil
 import subprocess
 import datetime
 import time
+from settings import SRC_DIR
 
 # comandos
-COMMAND_COMPILE = "./compile.sh"
-COMMAND_POWER_FLOW = "./FPO.sh"
-COMMAND_SHORT_CIRCUIT = "./CC.sh"
+COMMAND_COMPILE = SRC_DIR + "compile.sh"
+COMMAND_POWER_FLOW = SRC_DIR + "FPO.sh"
+COMMAND_SHORT_CIRCUIT = SRC_DIR + "CC.sh"
 
 
 def calcule(math_method, inputs):
@@ -42,7 +43,7 @@ def calcule(math_method, inputs):
 
 
 def create_directory(math_method):
-    dir_tmp = "tmp/"
+    dir_tmp = SRC_DIR + "/tmp/"
     try:
         os.mkdir(dir_tmp)
     except Exception as e:
@@ -150,12 +151,3 @@ def remove_inputs(results, input_files):
 
     for key in keys_remove:
         results.pop(key, None)
-
-
-def compile_CC():
-    try:
-        os.mkdir("../dist")
-    except:
-        pass
-    process = subprocess.Popen(COMMAND_COMPILE, shell=True)
-    output, error = process.communicate()

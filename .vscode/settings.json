@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "${workspaceFolder}/local/bin/python",
+    "python.pythonPath": "local/bin/python",
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
@@ -14,5 +14,8 @@
     },
     "files.associations": {
         "fstream": "cpp"
-    }
+    },
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.pep8Enabled": true
 }

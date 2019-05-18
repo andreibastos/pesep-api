@@ -107,7 +107,6 @@ ENV/
 .mypy_cache/
 
 \.vscode/
-src/tweets.csv
 
 src/math/AMPL
 
@@ -117,6 +116,4 @@ src/math/Core
 
 ampl/
 
-*.crt
-*.key
-*.csr
+certs/

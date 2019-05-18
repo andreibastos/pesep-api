@@ -1,4 +1,7 @@
 #!/bin/bash
+if [ -d "src" ]; then
+    cd src
+fi
 
 # recebe a pasta que deve ser criada como pârametro
 dir=$1;
