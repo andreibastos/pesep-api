@@ -34,7 +34,7 @@ def calcule(math_method, inputs):
         input_files = os.listdir(directory)
         execute_command(command, directory)
         results = load_files(directory)
-        remove_inputs(results, input_files)
+        # remove_inputs(results, input_files)
         remove_temps(directory)
     except Exception as error:
         pass
