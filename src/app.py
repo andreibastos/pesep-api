@@ -17,7 +17,7 @@ import re
 import os
 
 from controllers.SystemEletricPower import calcule
-from settings import HEADER_FILES, SECRET_KEY
+from settings import HEADER_FILES, SECRET_KEY, PORT, DEBUG
 
 # Configurações
 app = Flask(__name__)
@@ -142,4 +142,4 @@ def get_headers():
 
 # Main
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', threaded=True, port=PORT, debug=DEBUG)
