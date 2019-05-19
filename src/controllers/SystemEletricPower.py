@@ -36,7 +36,8 @@ def calcule(math_method, inputs):
         results = load_files(directory)
         # remove_inputs(results, input_files)
         remove_temps(directory)
-    except Exception as error:
+    except Exception as e:
+        print(e)
         pass
 
     return results
@@ -47,12 +48,14 @@ def create_directory(math_method):
     try:
         os.mkdir(dir_tmp)
     except Exception as e:
+        print(e)
         pass
 
     directory_temp = dir_tmp + math_method
     try:
         os.mkdir(directory_temp)
     except Exception as e:
+        print(e)
         pass
 
     directory = os.path.join(
@@ -61,6 +64,7 @@ def create_directory(math_method):
     try:
         os.mkdir(directory)
     except Exception as e:
+        print(e)
         pass
 
     return directory
@@ -93,7 +97,8 @@ def save_file(name, lines):
 
                 index += 1
 
-    except Exception as error:
+    except Exception as e:
+        print(e)
         pass
 
 
@@ -106,7 +111,8 @@ def remove_temps(directory):
     try:
         if (os.path.exists(directory)):
             shutil.rmtree(directory, ignore_errors=True)
-    except Exception as error:
+    except Exception as e:
+        print(e)
         pass
 
 

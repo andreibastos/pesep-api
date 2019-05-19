@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM alpine:3.9
 
 # define a pasta de trabalho
 WORKDIR /root/app
@@ -7,11 +7,17 @@ WORKDIR /root/app
 COPY . /root/app
 
 # Instala as dependencias
-RUN apt-get update && apt-get install -y python-pip g++ wget
+RUN apk add --update gcc
+RUN apk add --update g++
+RUN apk add --update python2-dev
+RUN apk add --update py2-pip
+RUN apk add --update libffi-dev
+RUN apk add --update openssl-dev
 RUN pip install -r requirements.txt --no-cache-dir
 
 # # inicializa o repositóro (baixa ampl, compila o cc) 
-RUN sh src/init.sh
+# RUN sh src/init.sh
+RUN sh src/compile_cc.sh
 
 # variáveis de ambiente
 ENV SECRET_KEY=super-secret
