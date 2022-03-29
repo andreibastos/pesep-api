@@ -1,6 +1,6 @@
 Flask>=0.12.3
 Flask-HTTPAuth==3.2.3
 Flask-Uploads==0.2.1
-Flask-Cors==3.0.4
+Flask-Cors==3.0.9
 pyopenssl==18.0.0
 python-dotenv==0.10.2
